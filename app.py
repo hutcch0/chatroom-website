@@ -9,7 +9,7 @@ import traceback
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = '' 
+app.secret_key = ''  
 
 
 def get_db_connection():
@@ -31,7 +31,6 @@ def init_db():
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS messages (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -40,7 +39,6 @@ def init_db():
                 )
             ''')
 
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS admins (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -49,7 +47,6 @@ def init_db():
                 )
             ''')
 
-            
             cursor.execute('SELECT COUNT(*) as count FROM admins')
             if cursor.fetchone()['count'] == 0:
                 hashed_password = generate_password_hash(config.ADMIN_PASSWORD)
@@ -61,29 +58,32 @@ def init_db():
     finally:
         conn.close()
 
+def delete_message(message_id):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('DELETE FROM messages WHERE id = %s', (message_id,))
+            conn.commit()
+            if cursor.rowcount == 0:
+                logging.warning(f"Message with ID {message_id} not found.")
+            else:
+                logging.info(f"Message with ID {message_id} deleted.")
+    except Exception as e:
+        logging.error(f"Error deleting message: {e}")
+        conn.rollback()  # Rollback in case of error
+    finally:
+        conn.close()
+
 
 def load_messages():
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            cursor.execute('SELECT content, username FROM messages ORDER BY id ASC')
+            cursor.execute('SELECT id, content, username FROM messages ORDER BY id ASC')
             messages = cursor.fetchall()
     finally:
         conn.close()
     return messages
-
-
-def save_message(content, username=None):
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                'INSERT INTO messages (content, username) VALUES (%s, %s)',
-                (content, username)
-            )
-        conn.commit()
-    finally:
-        conn.close()
 
 
 def verify_admin_credentials(username, password):
@@ -112,8 +112,8 @@ def admin_login():
             session['is_admin'] = True
             session['username'] = 'System'  
             return redirect(url_for('admin_chat'))  
-
-        return "Invalid credentials", 401 
+            
+        return "Invalid credentials", 401  
 
     return render_template('admin.html')  
 
@@ -151,26 +151,6 @@ def index_page():
     return render_template('index.html', messages=messages)  
 
 
-
-@app.route('/send_message', methods=['POST'])
-def send_message():
-    data = request.get_json()  
-    message_content = data.get('message')
-    username = session.get('username', 'Guest') 
-
-    
-    if len(message_content) > 1000:
-        return jsonify({'status': 'error', 'message': 'Message exceeds the 1000 character limit'}), 400
-
-    if message_content:
-        save_message(message_content, username)  
-
-        
-        return jsonify({'status': 'success', 'message': f'{username}: {message_content}'})
-    else:
-        return jsonify({'status': 'error', 'message': 'No message content provided'}), 400
-
-
 @app.route('/admin/chat', methods=['GET', 'POST'])
 def admin_chat():
     
@@ -178,18 +158,86 @@ def admin_chat():
         return redirect(url_for('index_page'))  
 
     if request.method == 'POST':
-        message_content = request.form['message']
+        message_content = request.json.get('message') 
         if message_content:
             save_message(message_content, 'System')  
-            return redirect(url_for('admin_chat'))
+            return jsonify({'status': 'success'})  
 
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        messages = load_messages()
+        return jsonify({'messages': messages})  
+
+    
     messages = load_messages()
     return render_template('admin_chat.html', messages=messages)
 
 
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    data = request.get_json()  
+    message_content = data.get('message')
+    username = session.get('username', 'Guest')  
+
+    
+    if len(message_content) > 1000:
+        return jsonify({'status': 'error', 'message': 'Message exceeds the 1000 character limit'}), 400
+
+    if message_content:
+        
+        message_id = save_message(message_content, username)  
+
+        
+        return jsonify({'status': 'success', 'message': message_content, 'message_id': message_id})
+    else:
+        return jsonify({'status': 'error', 'message': 'No message content provided'}), 400
+
+
+def save_message(content, username=None):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                'INSERT INTO messages (content, username) VALUES (%s, %s)',
+                (content, username)
+            )
+            
+            message_id = cursor.lastrowid
+        conn.commit()
+        return message_id  
+    finally:
+        conn.close()
+
+
+@app.route('/poll_messages', methods=['GET'])
+def poll_messages():
+    messages = load_messages()
+    return jsonify({'messages': messages})  
+
+
+@app.route('/admin/delete_message', methods=['POST'])
+def delete_message_route():
+    if request.is_json:
+        data = request.get_json()
+        message_id = data.get('message_id')
+
+        if message_id:
+            try:
+                
+                delete_message(message_id)
+                return jsonify({'status': 'success', 'message': 'Message deleted successfully.'})
+            except Exception as e:
+                logging.error(f"Failed to delete message {message_id}: {e}")
+                return jsonify({'status': 'error', 'message': 'Error deleting message.'}), 500
+        else:
+            return jsonify({'status': 'error', 'message': 'No message ID provided.'}), 400
+    else:
+        return jsonify({'status': 'error', 'message': 'Invalid request format. Expected JSON.'}), 400
+
+
 @app.route('/logout')
 def logout():
-    session.clear()  
+    session.clear() 
     return redirect(url_for('index_page'))  
 
 
