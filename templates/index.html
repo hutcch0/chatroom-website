@@ -4,35 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatroom</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        #title {
+            display: flex; /* Enable flexbox for layout */
+            align-items: center; /* Vertically align items */
+        }
+
+        #title img {
+            height: 50px; /* Adjust the initial size as needed */
+            margin-right: 10px; /* Add some space between image and text */
+        }
+
+        #top-right-links {
+            position: absolute;
+            top: 10px; /* Adjust top position as needed */
+            right: 10px; /* Adjust right position as needed */
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Title fixed at the top -->
-    <div id="title">Chatroom</div>
+    <div id="title">
+        <img src="{{ url_for('static', filename='chat_icon.jpg') }}" alt="Chatroom Logo">
+        Chatroom v1.01
+    </div>
 
-    <!-- Top-right links for About and News -->
     <div id="top-right-links">
         <a href="{{ url_for('about') }}">About</a>
         <a href="{{ url_for('news') }}">News</a>
     </div>
 
-    <!-- Chat area -->
     <div id="chat">
         <ul id="messages">
             {% for message in messages %}
                 <li>
                     {{ message.content }}
                     {% if message.username %}
-                        - <strong>{{ message.username }}</strong>
+                         - <strong>{{ message.username }}</strong>
                     {% endif %}
                 </li>
             {% endfor %}
         </ul>
     </div>
 
-    <!-- Chat form -->
     <form id="chat-form" onsubmit="submitMessage(event)">
         <input type="text" id="message-input" name="message" placeholder="Type a message..." required maxlength="1000">
         <button type="submit">Send</button>
