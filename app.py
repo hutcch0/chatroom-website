@@ -3,6 +3,7 @@ import pymysql
 import config
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -191,4 +192,5 @@ def logout():
 
 # Function to run the Flask app
 if __name__ == '__main__':
-    app.run(debug=True)
+    debug_mode = os.getenv('FLASK_ENV') == 'development'
+    app.run(debug=debug_mode)
