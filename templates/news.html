@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News</title>
+    <!-- Link to the news.css stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/news.css') }}">
+</head>
+<body>
+    <!-- Title outside the content box -->
+    <h1 class="page-title">News</h1>
+
+    <div class="content">
+        <h2>Latest News</h2>
+        <p>Added about the project page.</p>
+        <p>Added news page.</p>
+        <p>Cleaned the front chatroom up.</p>
+        <p>Cleaned the code up.</p>
+        <p>Runs faster.</p>
+        <p>Fixed bugs.</p>
+        <p>Added a database.</p>
+        <p>Character limit (1000 Characters).</p>
+        <p>Adding a user name feature.</p>
+
+        <h2>Planned Updates</h2>
+        <p>Adding a bot.</p>
+        <p>Adding button for changing colour.</p>
+        <p>Adding a button for suggestions.</p>
+        <p>a custom user name feature.</p>
+        <p>connecting a discord server to the chatroom.</p>
+        <p>Moderation features</p>
+        <p>Word Filters</p>
+        <p>rules page</p>
+        <p>Emojis and Reactions</p>
+        <p>Special Effects</p>
+
+        <footer>
+            <p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p>
+        </footer>
+
+    </div>
+</body>
+</html>
