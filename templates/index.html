@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatroom</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <!-- Title fixed at the top -->
+    <div id="title">Chatroom</div>
+
+    <!-- Top-right links for About and News -->
+    <div id="top-right-links">
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('news') }}">News</a>
+    </div>
+
+    <!-- Chat area -->
+    <div id="chat">
+        <ul id="messages">
+            {% for message in messages %}
+                <li>
+                    {{ message.content }}
+                    {% if message.username %}
+                        - <strong>{{ message.username }}</strong>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Chat form -->
+    <form id="chat-form" onsubmit="submitMessage(event)">
+        <input type="text" id="message-input" name="message" placeholder="Type a message..." required maxlength="1000">
+        <button type="submit">Send</button>
+    </form>
+
+   <script>
+    // AJAX function to submit the message without refreshing the page
+function submitMessage(event) {
+    event.preventDefault();  // Prevent the form from submitting the traditional way
+
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value;
+
+    if (message) {
+        // Send the message using AJAX (fetch)
+        fetch('{{ url_for("send_message") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Clear the input field after sending the message
+                messageInput.value = '';
+
+                // Append the new message to the messages list
+                const messagesList = document.getElementById('messages');
+                const newMessage = document.createElement('li');
+                newMessage.textContent = data.message;
+                messagesList.appendChild(newMessage);
+
+                // Scroll to the bottom of the chat
+                messagesList.scrollTop = messagesList.scrollHeight;
+            } else if (data.status === 'error') {
+                // Display error message if the message exceeds the limit
+                alert(data.message);  // You can display this error using an alert or a custom error div
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+</script>
+
+</body>
+</html>
