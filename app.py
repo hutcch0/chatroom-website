@@ -4,7 +4,7 @@ import config
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 import os
-
+import traceback
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
@@ -122,14 +122,16 @@ def about():
     try:
         return render_template('about.html')
     except Exception as e:
-        return str(e), 500
+        logging.error(f"Error rendering about page: {traceback.format_exc()}")
+        return "An internal error has occurred!", 500
 
 @app.route('/news')
 def news():
     try:
         return render_template('news.html')
     except Exception as e:
-        return str(e), 500
+        logging.error(f"Error rendering news page: {traceback.format_exc()}")
+        return "An internal error has occurred!", 500
 
 @app.route('/chatroom')
 def chatroom_page():
