@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>News</title>
-    <!-- Link to the news.css stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/news.css') }}">
+    <style>
+        .content {
+            max-height: 800px; /* Adjust the height as needed */
+            overflow-y: auto;
+            border: 1px solid #ccc; /* Add a border for visual separation */
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <!-- Title outside the content box -->
     <h1 class="page-title">News</h1>
 
     <div class="content">
@@ -35,10 +41,15 @@
         <p>Emojis and Reactions</p>
         <p>Special Effects</p>
 
-        <footer>
-            <p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p>
-        </footer>
-
+        <h2>bugs fixed</h2>
+        <p>Fix code: Information exposure through an exception</p>
+        <p>Fix code: Flask app is run in debug mode</p>
+        <p>fix: Werkzeug debugger vulnerable to remote execution when interacting with attacker controlled domain</p>
     </div>
+
+    <footer>
+        <p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p>
+    </footer>
+
 </body>
 </html>
