@@ -136,6 +136,10 @@ def verify_admin_credentials(username, password):
 def admin_chat_page():
     return render_template('admin_chat.html')
 
+@app.route('/rules')
+def rules():
+    return render_template('rules.html')
+
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
