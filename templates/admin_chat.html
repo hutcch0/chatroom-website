@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Chatroom</title>
+</head>
+<body>
+    <h1>Admin Chatroom</h1>
+    <a href="{{ url_for('logout') }}">Logout</a>
+    <div id="chat">
+        <ul>
+            {% for message in messages %}
+                <li><strong>{{ message.username if message.username else "Guest" }}:</strong> {{ message.content }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <form method="POST">
+        <input type="text" name="message" placeholder="Type a message..." required>
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>
