@@ -4,20 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Chatroom</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #chat {
+            margin-top: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        #messages {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #messages li {
+            margin-bottom: 10px;
+        }
+
+        .delete-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #chat-form {
+            margin-top: 10px;
+        }
+
+        #chat-form input {
+            width: 80%;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        #chat-form button {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Admin Chatroom</h1>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    <div id="chat">
-        <ul>
-            {% for message in messages %}
-                <li><strong>{{ message.username if message.username else "Guest" }}:</strong> {{ message.content }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <form method="POST">
-        <input type="text" name="message" placeholder="Type a message..." required>
-        <button type="submit">Send</button>
-    </form>
+
+<h1>Admin Chatroom</h1>
+<a href="{{ url_for('logout') }}">Logout</a>
+
+<div id="chat">
+    <ul id="messages">
+        {% for message in messages %}
+            <li id="message-{{ message.id }}">
+                <strong>{{ message.username if message.username else "Guest" }}:</strong> {{ message.content }}
+                <button class="delete-btn" onclick="deleteMessage({{ message.id }})">Delete</button>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<form id="chat-form">
+    <input type="text" id="message-input" placeholder="Type a message..." required>
+    <button type="submit">Send</button>
+</form>
+
+<script>
+// Function to send the message using AJAX
+function sendMessage(event) {
+    event.preventDefault(); // Prevent the form from submitting the traditional way
+
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value.trim();
+
+    if (message) {
+        // Send the message using AJAX (fetch)
+        fetch('/admin/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                messageInput.value = '';
+                fetchMessages(); // Fetch new messages after sending the message
+            } else {
+                alert('Error sending message!');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+// Function to fetch new messages
+function fetchMessages() {
+    fetch('/admin/chat', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest', // Mark as an AJAX request
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messagesList = document.getElementById('messages');
+        messagesList.innerHTML = ''; // Clear current messages
+
+        data.messages.forEach(message => {
+            const li = document.createElement('li');
+            li.id = `message-${message.id}`;
+            li.innerHTML = `<strong>${message.username || 'Guest'}:</strong> ${message.content}
+                            <button class="delete-btn" onclick="deleteMessage(${message.id})">Delete</button>`;
+            messagesList.appendChild(li);
+        });
+
+        // Scroll to the bottom to show the latest message
+        messagesList.scrollTop = messagesList.scrollHeight;
+    })
+    .catch(error => console.error('Error fetching messages:', error));
+}
+
+// Function to delete a message using AJAX
+function deleteMessage(messageId) {
+    if (confirm('Are you sure you want to delete this message?')) {
+        fetch('/admin/delete_message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message_id: messageId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // If the deletion was successful, remove the message from the DOM
+                const messageElement = document.getElementById(`message-${messageId}`);
+                messageElement.remove();
+            } else {
+                alert('Error deleting message: ' + data.message);
+                console.error('Error:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error with the deletion. Please try again later.');
+        });
+    }
+}
+
+
+// Poll every 5 seconds to get new messages
+setInterval(fetchMessages, 5000);
+
+// Attach sendMessage to the form submit event
+const chatForm = document.getElementById('chat-form');
+chatForm.addEventListener('submit', sendMessage);
+</script>
+
 </body>
 </html>
