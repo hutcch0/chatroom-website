@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About This Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background-color: #f4f4f4;"> <!-- Light grey background -->
+    <!-- Page content starts here -->
+    <div id="about-container">
+        <h1>About This Chatroom Project</h1>
+
+        <section class="project-description">
+            <h2>Introduction</h2>
+            <p>
+                This is a simple chatroom project built with Flask, Python, and MySQL. It allows users to send and receive messages in real-time, providing a platform for casual communication.
+            </p>
+        </section>
+
+        <section class="project-details">
+            <h2>How It Works</h2>
+            <p>
+                Users can enter messages in the input field, which are then stored in a MySQL database. The messages are displayed in a dynamic list, and new messages are shown in real-time using AJAX.
+            </p>
+            <ul>
+                <li>Message history is saved and displayed when the page is refreshed.</li>
+                <li>New messages are dynamically added to the chat window without refreshing the page.</li>
+                <li>Users can interact with the chatroom instantly.</li>
+            </ul>
+        </section>
+
+        <section class="project-goals">
+            <h2>Project Goals</h2>
+            <p>
+                The main goals of this project are to:
+            </p>
+            <ul>
+                <li>Learn how to build a web application using Flask and MySQL.</li>
+                <li>Understand how to implement real-time updates using AJAX.</li>
+                <li>Build a user-friendly and responsive interface.</li>
+            </ul>
+        </section>
+
+        <section class="contact">
+            <h2>Contact</h2>
+            <p>If you have any questions or feedback, feel free to contact us at <a href="8hqz5hgfb@mozmail.com">8hqz5hgfb@mozmail.com</a>.</p>
+        </section>
+    </div>
+
+    <!-- Footer (optional) -->
+    <footer>
+        <p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p>
+    </footer>
+</body>
+</html>
