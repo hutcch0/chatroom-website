@@ -41,7 +41,7 @@
     <div id="chat">
         <ul id="messages">
             {% for message in messages %}
-                <li>
+                <li id="message-{{ message.id }}">
                     {{ message.content }}
                     {% if message.username %}
                          - <strong>{{ message.username }}</strong>
