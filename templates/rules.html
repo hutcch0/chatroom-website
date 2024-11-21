@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rules</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rules.css') }}">
+    <style>
+        .content {
+            max-height: 800px; /* Adjust the height as needed */
+            overflow-y: auto;
+            border: 1px solid #ccc; /* Add a border for visual separation */
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="page-title">rules</h1>
+
+    <div class="content">
+        <h2>Be Respectful</h2>
+        <p>No personal attacks or insults: Encourage kindness and constructive conversation.</p>
+        <p>No hate speech or discrimination: Make it clear that prejudice of any kind is not tolerated.</p>
+        <p>Respect opinions: Even when disagreeing, do so respectfully.</p>
+
+        <h2>Keep it Clean</h2>
+        <p>No profanity or offensive language: Set a standard for appropriate language.</p>
+        <p>No sexually explicit content: This includes text, images, or links.</p>
+        <p>No spamming or flooding: Discourage repetitive messages or excessive use of caps.</p>
+
+        <h2>Protect Privacy</h2>
+        <p>No sharing personal information: Remind users this is an anonymous space and to protect their own and others' privacy.</p>
+        <p>No doxing or revealing identities: Strictly prohibit any attempts to uncover someone's real-life identity.</p>
+
+        <h2>Promote Good Communication</h2>
+        <p>Stay on topic: While casual conversation is fine, discourage derailing the main flow.</p>
+        <p>No impersonation: Users should not pretend to be someone else.</p>
+        <p>Be mindful of others: Encourage users to be aware of the diverse community and avoid potentially insensitive topics.</p>
+
+        <h2>Responsibility and Consequences</h2>
+        <p>Users are responsible for their words: Clearly state that users are accountable for what they post.</p>
+        <p>Moderators have the final say: Explain that moderators can remove users or messages that violate the rules.</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p>
+    </footer>
+
+</body>
+</html>
