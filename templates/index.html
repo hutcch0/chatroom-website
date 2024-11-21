@@ -4,25 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatroom</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         #title {
             display: flex; /* Enable flexbox for layout */
-            align-items: center; /* Vertically align items */
+            align-items: center; /* Vertically align items to the center */
         }
 
         #title img {
             height: 50px; /* Adjust the initial size as needed */
-            margin-right: 10px; /* Add some space between image and text */
+            margin-right: 10px; /* Add space between image and text */
         }
 
         #top-right-links {
             position: absolute;
-            top: 10px; /* Adjust top position as needed */
-            right: 10px; /* Adjust right position as needed */
+            top: 10px; /* Adjust top position */
+            right: 10px; /* Adjust right position */
+            display: flex; /* Use flexbox to align the buttons horizontally */
+            gap: 10px; /* Add space between buttons */
+            align-items: center; /* Align items vertically with the title */
+        }
+
+        #top-right-links a {
+            text-decoration: none; /* Remove underline from links */
+            background-color: #4CAF50; /* Add background color for the buttons */
+            color: white; /* Text color */
+            padding: 10px 15px; /* Padding for the button */
+            border-radius: 5px; /* Round the corners */
+            font-size: 16px; /* Adjust font size */
+            display: inline-block; /* Make the link behave like a button */
+        }
+
+        #top-right-links a:hover {
+            background-color: #45a049; /* Darken button color on hover */
         }
     </style>
 </head>
@@ -30,13 +46,16 @@
 
     <div id="title">
         <img src="{{ url_for('static', filename='chat_icon.jpg') }}" alt="Chatroom Logo">
-        Chatroom v1.01
+        Chatroom v1.02
     </div>
 
+    <!-- Group links in a container -->
     <div id="top-right-links">
         <a href="{{ url_for('about') }}">About</a>
         <a href="{{ url_for('news') }}">News</a>
+        <a href="{{ url_for('rules') }}">Rules</a>
     </div>
+
 
     <div id="chat">
         <ul id="messages">
