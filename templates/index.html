@@ -54,6 +54,7 @@
         <a href="{{ url_for('about') }}">About</a>
         <a href="{{ url_for('news') }}">News</a>
         <a href="{{ url_for('rules') }}">Rules</a>
+        <a href="{{ url_for('image_viewer') }}">View Images</a>
     </div>
 
 
@@ -61,9 +62,13 @@
         <ul id="messages">
             {% for message in messages %}
                 <li id="message-{{ message.id }}">
-                    {{ message.content }}
+                    {% if message.content.startswith('/images/') %}
+                        <img src="{{ message.content }}" alt="Image">
+                    {% else %}
+                        {{ message.content }}
+                    {% endif %}
                     {% if message.username %}
-                         - <strong>{{ message.username }}</strong>
+                        - <strong>{{ message.username }}</strong>
                     {% endif %}
                 </li>
             {% endfor %}
@@ -75,45 +80,47 @@
         <button type="submit">Send</button>
     </form>
 
-   <script>
-    // AJAX function to submit the message without refreshing the page
-    function submitMessage(event) {
-        event.preventDefault();  // Prevent the form from submitting the traditional way
+    <script>
+        function submitMessage(event) {
+            event.preventDefault();
 
-        const messageInput = document.getElementById('message-input');
-        const message = messageInput.value;
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value;
 
-        if (message) {
-            // Send the message using AJAX (fetch)
-            fetch('{{ url_for("send_message") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Clear the input field after sending the message
-                    messageInput.value = '';
+            if (message) {
+                fetch('{{ url_for("send_message") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const messagesList = document.getElementById('messages');
+                        const newMessage = document.createElement('li');
 
-                    // Append the new message to the messages list
-                    const messagesList = document.getElementById('messages');
-                    const newMessage = document.createElement('li');
-                    newMessage.textContent = data.message;
-                    messagesList.appendChild(newMessage);
+                        // Check if the message is an image URL
+                        if (data.message.startsWith('/images/')) {
+                            const img = document.createElement('img');
+                            img.src = data.message;
+                            img.alt = 'Image';
+                            newMessage.appendChild(img);
+                        } else {
+                            newMessage.textContent = data.message;
+                        }
 
-                    // Scroll to the bottom of the chat
-                    messagesList.scrollTop = messagesList.scrollHeight;
-                } else if (data.status === 'error') {
-                    // Display error message if the message exceeds the limit
-                    alert(data.message);  // You can display this error using an alert or a custom error div
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                        messagesList.appendChild(newMessage);
+                        messagesList.scrollTop = messagesList.scrollHeight;
+                        messageInput.value = '';
+                    } else if (data.status === 'error') {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
         }
-    }
 
     // Poll for new messages every 3 seconds
     function pollForMessages() {
@@ -144,3 +151,5 @@
 
 </body>
 </html>
+
+
