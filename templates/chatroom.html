@@ -38,42 +38,53 @@
 
     <!-- AJAX and Scrolling -->
 <script>
-    function submitMessage(event) {
-        event.preventDefault(); // Prevent the default form submission
+function submitMessage(event) {
+    event.preventDefault(); // Prevent the default form submission
 
-        const messageInput = document.querySelector('#message-input');
-        const message = messageInput.value;
+    const messageInput = document.querySelector('#message-input');
+    const message = messageInput.value;
 
-        if (message) {
-            fetch('{{ url_for("send_message") }}', {  // This should resolve to '/send_message'
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: message }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const messagesList = document.getElementById('messages');
-                    const newMessage = document.createElement('li');
+    if (message) {
+        fetch('{{ url_for("send_message") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const messagesList = document.getElementById('messages');
+                const newMessage = document.createElement('li');
+
+                // Check if the message is an image URL
+                if (data.message.startsWith('/images/')) {
+                    const img = document.createElement('img');
+                    img.src = data.message;
+                    img.alt = 'Image';
+                    newMessage.appendChild(img);
+                } else {
                     newMessage.textContent = data.message;
-                    newMessage.style.marginBottom = '10px';
-                    newMessage.style.padding = '10px';
-                    newMessage.style.borderRadius = '5px';
-                    newMessage.style.background = '#e9ecef';
-                    newMessage.style.fontSize = '18px';
-                    messagesList.appendChild(newMessage);
-
-                    // Automatically scroll to the newest message
-                    messagesList.scrollTop = messagesList.scrollHeight;
-
-                    messageInput.value = ''; // Clear the input field
                 }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+
+                newMessage.style.marginBottom = '10px';
+                newMessage.style.padding = '10px';
+                newMessage.style.borderRadius = '5px';
+                newMessage.style.background = '#e9ecef';
+                newMessage.style.fontSize = '18px';
+                messagesList.appendChild(newMessage);
+
+                messagesList.scrollTop = messagesList.scrollHeight;
+
+                messageInput.value = '';
+            } else if (data.status === 'error') {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
+}
 </script>
 </body>
 </html>
