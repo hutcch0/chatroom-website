@@ -8,77 +8,133 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-        #title {
-            display: flex; /* Enable flexbox for layout */
-            align-items: center; /* Vertically align items to the center */
+        /* Add styles for the login form */
+        #login-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        #login-form input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 200px;
+        }
+
+        #login-form button {
+            padding: 10px;
+            width: 220px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #login-form button:hover {
+            background-color: #45a049;
         }
 
         #title img {
-            height: 50px; /* Adjust the initial size as needed */
-            margin-right: 10px; /* Add space between image and text */
+        width: 30px; /* Set a smaller width */
+        height: 30px; /* Set a fixed height */
+        margin-right: 10px; /* Space between the image and the text */
+        }
+
+        #header {
+        display: flex; /* Enable flexbox for the layout */
+        justify-content: space-between; /* Push the title to the left and the buttons to the right */
+        align-items: center; /* Vertically align both title and buttons */
+        padding: 10px 20px; /* Add padding to keep everything spaced nicely */
+        position: fixed; /* Make the header fixed at the top */
+        top: 0; /* Align at the top */
+        left: 0; /* Align to the left of the screen */
+        right: 0; /* Align to the right of the screen */
+        background-color: #fff; /* Set background color for header */
+        z-index: 1000; /* Ensure the header stays on top */
+        }
+
+        #title {
+        display: flex;
+        align-items: center; /* Vertically center the title with the image */
+        }
+
+        #title img {
+        width: 30px; /* Adjust the image width */
+        height: auto; /* Keep the aspect ratio */
+        margin-right: 10px; /* Space between image and title */
         }
 
         #top-right-links {
-            position: absolute;
-            top: 10px; /* Adjust top position */
-            right: 10px; /* Adjust right position */
-            display: flex; /* Use flexbox to align the buttons horizontally */
-            gap: 10px; /* Add space between buttons */
-            align-items: center; /* Align items vertically with the title */
+        display: flex; /* Align buttons in a row */
+        gap: 10px; /* Space between the buttons */
         }
 
         #top-right-links a {
-            text-decoration: none; /* Remove underline from links */
-            background-color: #4CAF50; /* Add background color for the buttons */
-            color: white; /* Text color */
-            padding: 10px 15px; /* Padding for the button */
-            border-radius: 5px; /* Round the corners */
-            font-size: 16px; /* Adjust font size */
-            display: inline-block; /* Make the link behave like a button */
+        text-decoration: none; /* Remove underline from links */
+        background-color: #4CAF50; /* Button background color */
+        color: white; /* Button text color */
+        padding: 10px 15px; /* Padding for the button */
+        border-radius: 5px; /* Round the corners */
+        font-size: 16px; /* Font size */
         }
 
         #top-right-links a:hover {
-            background-color: #45a049; /* Darken button color on hover */
+        background-color: #45a049; /* Darken the button color on hover */
         }
     </style>
 </head>
 <body>
 
-    <div id="title">
-        <img src="{{ url_for('static', filename='chat_icon.jpg') }}" alt="Chatroom Logo">
-        Chatroom v1.02
-    </div>
+    {% if session.get('username') %}
+        <!-- Display chatroom if user is logged in -->
+        <div id="title">
+            <img src="{{ url_for('static', filename='chat_icon.jpg') }}" alt="Chatroom Logo">
+            Chatroom v1.03 - Welcome, {{ session['username'] }}
+        </div>
+        <div id="top-right-links">
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('news') }}">News</a>
+            <a href="{{ url_for('rules') }}">Rules</a>
+            <a href="{{ url_for('image_viewer') }}">View Images</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('games') }}">Games</a>
+        </div>
 
-    <!-- Group links in a container -->
-    <div id="top-right-links">
-        <a href="{{ url_for('about') }}">About</a>
-        <a href="{{ url_for('news') }}">News</a>
-        <a href="{{ url_for('rules') }}">Rules</a>
-        <a href="{{ url_for('image_viewer') }}">View Images</a>
-    </div>
+        <!-- Chat content -->
+        <div id="chat">
+            <ul id="messages">
+                {% for message in messages %}
+                    <li id="message-{{ message.id }}">
+                        {% if message.content.startswith('/images/') %}
+                            <img src="{{ message.content }}" alt="Image">
+                        {% else %}
+                            {{ message.content }}
+                        {% endif %}
+                        {% if message.username %}
+                            - <strong>{{ message.username }}</strong>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <form id="chat-form" onsubmit="submitMessage(event)">
+            <input type="text" id="message-input" name="message" placeholder="Type a message..." required maxlength="1000">
+            <button type="submit">Send</button>
+        </form>
 
-
-    <div id="chat">
-        <ul id="messages">
-            {% for message in messages %}
-                <li id="message-{{ message.id }}">
-                    {% if message.content.startswith('/images/') %}
-                        <img src="{{ message.content }}" alt="Image">
-                    {% else %}
-                        {{ message.content }}
-                    {% endif %}
-                    {% if message.username %}
-                        - <strong>{{ message.username }}</strong>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <form id="chat-form" onsubmit="submitMessage(event)">
-        <input type="text" id="message-input" name="message" placeholder="Type a message..." required maxlength="1000">
-        <button type="submit">Send</button>
-    </form>
+    {% else %}
+        <!-- Display login form if user is not logged in -->
+        <div id="login-form">
+            <h2>Login to Chatroom</h2>
+            <form method="POST" action="{{ url_for('login') }}">
+                <input type="text" name="username" placeholder="Enter Username" required>
+                <input type="password" name="password" placeholder="Enter Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    {% endif %}
 
     <script>
         function submitMessage(event) {
@@ -101,7 +157,6 @@
                         const messagesList = document.getElementById('messages');
                         const newMessage = document.createElement('li');
 
-                        // Check if the message is an image URL
                         if (data.message.startsWith('/images/')) {
                             const img = document.createElement('img');
                             img.src = data.message;
@@ -122,34 +177,25 @@
             }
         }
 
-    // Poll for new messages every 3 seconds
-    function pollForMessages() {
-        fetch('{{ url_for("index_page") }}')
-            .then(response => response.text())
-            .then(data => {
-                // Use a DOM parser to extract the new messages from the HTML response
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(data, 'text/html');
-                const newMessages = doc.getElementById('messages');
+        function pollForMessages() {
+            fetch('{{ url_for("index_page") }}')
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const newMessages = doc.getElementById('messages');
 
-                // Check if the messages list has changed
-                const currentMessages = document.getElementById('messages');
-                if (newMessages.innerHTML !== currentMessages.innerHTML) {
-                    currentMessages.innerHTML = newMessages.innerHTML;
+                    const currentMessages = document.getElementById('messages');
+                    if (newMessages.innerHTML !== currentMessages.innerHTML) {
+                        currentMessages.innerHTML = newMessages.innerHTML;
+                        currentMessages.scrollTop = currentMessages.scrollHeight;
+                    }
+                })
+                .catch(error => console.error('Error fetching new messages:', error));
+        }
 
-                    // Scroll to the bottom of the chat
-                    currentMessages.scrollTop = currentMessages.scrollHeight;
-                }
-            })
-            .catch(error => console.error('Error fetching new messages:', error));
-    }
-
-    // Start polling every 3 seconds (3000ms)
-    setInterval(pollForMessages, 3000);
-
-   </script>
+        setInterval(pollForMessages, 3000);
+    </script>
 
 </body>
 </html>
-
-
