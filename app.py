@@ -10,7 +10,7 @@ import re
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = '0VYK5QEFFthM7OBWwZGkbUpVBr8kCLQp'  # Replace with a strong, random secret key
+app.secret_key = ''  # Replace with a strong, random secret key
 
 # Function to connect to the database
 def get_db_connection():
