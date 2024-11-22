@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Viewer</title>
+</head>
+<body>
+    <h1>Image Viewer</h1>
+    <p>do /images/Angry.png or</p>
+    <p>AwOo.png</p>
+    <p>Hehe.png</p>
+    <p>KannaWhat.png</p>
+    <p>MadokaLewd.png</p>
+    <p>NepSmug.png</p>
+    <p>Ryukosip.png</p>
+    <p>SagiriShy.png</p>
+    <p>animeangry.png</p>
+    <p>aquacry.png</p>
+    <p>awoothink.png</p>
+    <p>baka.png</p>
+    <p>blushwow.png</p>
+    <p>flandre_concerned.png</p>
+    <p>headpat.png</p>
+    <p>kannabear.png</p>
+    <p>lmao.png</p>
+    <p>lurk.png</p>
+    <p>mashahello.png</p>
+    <p>ohmy.png</p>
+    <p>just do /images/ then whatever png you want</p>
+
+    <input type="text" id="filename-input" placeholder="Enter image filename (e.g., Angry.png)">
+    <button onclick="showImage()">Show Image</button>
+
+    <div id="image-container"></div>
+
+    <script>
+        function showImage() {
+            const filename = document.getElementById('filename-input').value;
+            const imageUrl = `/images/${filename}`; // This will point to your Flask route
+            const imageContainer = document.getElementById('image-container');
+
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = filename;
+
+            imageContainer.innerHTML = '';
+            imageContainer.appendChild(img);
+        }
+    </script>
+</body>
+</html>
