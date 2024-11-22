@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games & Fake Money</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='games.css') }}">
+    <style>
+
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h1>Welcome to the Game Zone, {{ username }}!</h1>
+        <div id="balance">Your Fake Money: $<span id="fake-money">{{ fake_money }}</span></div>
+    </div>
+
+    <!-- Spin the Wheel Game -->
+    <div class="game-container">
+        <h3>Spin the Wheel</h3>
+        <p>Try your luck! Spin the wheel to win or lose some fake money!</p>
+        <button class="game-button" id="spin-wheel">Spin</button>
+        <div id="wheel-result" class="game-result"></div>
+    </div>
+
+    <!-- Guess the Number Game -->
+    <div class="game-container">
+        <h3>Guess the Number</h3>
+        <p>Guess the correct number between 1 and 10 to win fake money!</p>
+        <input type="number" id="guess-number" min="1" max="10" placeholder="Your guess" />
+        <button class="game-button" id="submit-guess">Submit Guess</button>
+        <div id="guess-result" class="game-result"></div>
+    </div>
+
+    <!-- Leaderboard Link -->
+    <div class="game-container">
+        <h3>Leaderboard</h3>
+        <p><a href="{{ url_for('leaderboard') }}">View Leaderboard</a></p>
+    </div>
+
+    <script>
+        // Fake Money system (client-side)
+        let fakeMoney = {{ fake_money }}; // Initial fake money balance from the server
+
+        // Update the fake money balance on the page
+        function updateFakeMoney() {
+            document.getElementById('fake-money').textContent = fakeMoney;
+        }
+
+        // Spin the Wheel Game
+        document.getElementById('spin-wheel').addEventListener('click', () => {
+            const result = Math.floor(Math.random() * 151) - 50; // Random win/loss amount
+            fakeMoney += result;
+            let resultText = `You ${result >= 0 ? 'won' : 'lost'} $${Math.abs(result)}!`;
+            document.getElementById('wheel-result').textContent = resultText;
+            updateFakeMoney();
+
+            // Send the updated fake money to the server
+            fetch('/update_fake_money', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fake_money: fakeMoney })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      console.log('Fake money updated successfully!');
+                  } else {
+                      console.log('Error updating fake money.');
+                  }
+              }).catch(error => {
+                  console.error('Error:', error);
+              });
+        });
+
+        // Guess the Number Game
+        document.getElementById('submit-guess').addEventListener('click', () => {
+            const userGuess = parseInt(document.getElementById('guess-number').value);
+            const correctNumber = Math.floor(Math.random() * 10) + 1; // Random number between 1 and 10
+
+            let resultMessage = '';
+            if (userGuess === correctNumber) {
+                const winAmount = 20;
+                fakeMoney += winAmount;
+                resultMessage = `Correct! You win $${winAmount}!`;
+            } else {
+                resultMessage = `Incorrect! The correct number was ${correctNumber}.`;
+            }
+
+            document.getElementById('guess-result').textContent = resultMessage;
+            updateFakeMoney();
+
+            // Send the updated fake money to the server
+            fetch('/update_fake_money', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fake_money: fakeMoney })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      console.log('Fake money updated successfully!');
+                  } else {
+                      console.log('Error updating fake money.');
+                  }
+              }).catch(error => {
+                  console.error('Error:', error);
+              });
+        });
+    </script>
+
+</body>
+</html>
