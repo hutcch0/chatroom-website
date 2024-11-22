@@ -12,5 +12,7 @@ def uploaded_file(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    debug_mode = os.getenv('FLASK_DEBUG', '0') == '1'
+    app.run(debug=debug_mode)
   # Use debug=False for production
