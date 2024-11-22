@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_from_directory # Import send_from_directory
 import pymysql
 import config
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,7 +10,7 @@ import re
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = ''  # Replace with a strong, random secret key
+app.secret_key = 'no'  # Replace with a strong, random secret key
 
 # Function to connect to the database
 def get_db_connection():
@@ -66,6 +66,27 @@ def contains_blacklisted_word(message):
         if re.search(r'\b' + re.escape(word) + r'\b', message, re.IGNORECASE):
             return True
     return False
+
+UPLOAD_FOLDER = '/home/hutcch/chatroom/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/images/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/upload_image', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image part'}), 400
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file:
+
+        filename = secure_filename(file.filename)  # Import secure_filename from werkzeug.utils
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        return jsonify({'image_url': f'/images/{filename}'})
 
 def load_blacklist(file_path):
     try:
@@ -174,6 +195,10 @@ def news():
 @app.route('/chatroom')
 def chatroom_page():
     return render_template('chatroom.html')
+
+@app.route('/image_viewer')
+def image_viewer():
+    return render_template('image_viewer.html')
 
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/', methods=['GET', 'POST'])
