@@ -48,6 +48,22 @@ def init_db():
                 )
             ''')
 
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(50) UNIQUE NOT NULL,
+                    password_hash VARCHAR(255) NOT NULL
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS leaderboard (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(50) NOT NULL,
+                    score INT NOT NULL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+
             cursor.execute('SELECT COUNT(*) as count FROM admins')
             if cursor.fetchone()['count'] == 0:
                 hashed_password = generate_password_hash(config.ADMIN_PASSWORD)
@@ -58,6 +74,181 @@ def init_db():
         conn.commit()
     finally:
         conn.close()
+
+def register_user(username, password):
+    hashed_password = generate_password_hash(password)
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('''
+                INSERT INTO users (username, password_hash)
+                VALUES (%s, %s)
+            ''', (username, hashed_password))
+            conn.commit()
+    finally:
+        conn.close()
+
+def verify_user_credentials(username, password):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('SELECT password_hash FROM users WHERE username = %s', (username,))
+            result = cursor.fetchone()
+            if result and check_password_hash(result['password_hash'], password):
+                return True
+    finally:
+        conn.close()
+    return False
+
+def add_fake_money_column():
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            # Check if the column already exists
+            cursor.execute("SHOW COLUMNS FROM users LIKE 'fake_money';")
+            result = cursor.fetchone()
+
+            if result:
+                print("Column 'fake_money' already exists.")
+            else:
+                # SQL query to add the column
+                add_column_query = """
+                    ALTER TABLE users
+                    ADD COLUMN fake_money INT DEFAULT 0;
+                """
+                cursor.execute(add_column_query)
+                connection.commit()
+                print("Column 'fake_money' added successfully.")
+    except pymysql.MySQLError as e:
+        print("Error adding column:", e)
+    finally:
+        connection.close()
+
+# Call the function
+add_fake_money_column()
+
+def get_fake_money(username):
+    # Get database connection using the function
+    connection = get_db_connection()
+    if connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT fake_money FROM users WHERE username = %s", (username,))
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+
+        if result:
+            return result['fake_money']  # Return the fake money value from the result
+        else:
+            return 0  # Default to 0 if the user is not found
+    else:
+        return 0  # If connection fails, return 0 as a fallback
+
+@app.route('/games')
+def games():
+    username = session.get('username', None)  # Assuming you're using session to store the username
+    if username:
+        fake_money = get_fake_money(username)
+        return render_template('games.html', username=username, fake_money=fake_money)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/update_fake_money', methods=['POST'])
+def update_fake_money():
+    if 'username' in session:
+        data = request.get_json()
+        fake_money = data['fake_money']
+        username = session['username']
+        # Update the user's fake money balance in the database
+        update_fake_money_in_db(username, fake_money)
+        return jsonify({'status': 'success'})
+    return jsonify({'status': 'failure', 'message': 'User not logged in'})
+
+def update_fake_money_in_db(username, fake_money):
+    # This should update the user's fake money in the database
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE users SET fake_money = %s WHERE username = %s", (fake_money, username))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+
+@app.route('/leaderboard')
+def leaderboard():
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT username, fake_money FROM users ORDER BY fake_money DESC LIMIT 10")
+            leaderboard_data = cursor.fetchall()
+
+            # Convert list of tuples to a dictionary with ranks as keys
+            leaderboard_data = {index + 1: {'username': data['username'], 'fake_money': data['fake_money']}
+                                 for index, data in enumerate(leaderboard_data)}
+
+            return render_template('leaderboard.html', leaderboard_data=leaderboard_data)
+    except pymysql.MySQLError as e:
+        print(f"Error fetching leaderboard data: {e}")
+        return "Error fetching leaderboard data", 500
+    finally:
+        connection.close()
+
+@app.route('/update_score', methods=['POST'])
+def update_score():
+    if 'username' not in session:
+        return jsonify({'status': 'error', 'message': 'User not logged in'}), 401
+
+    username = session['username']
+    score = request.form['score']  # You could get this value from a challenge or game logic
+
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('''
+                INSERT INTO leaderboard (username, score)
+                VALUES (%s, %s)
+                ON DUPLICATE KEY UPDATE score = GREATEST(score, %s)
+            ''', (username, score, score))
+            conn.commit()
+    finally:
+        conn.close()
+
+    return jsonify({'status': 'success', 'message': 'Score updated successfully'})
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if verify_user_credentials(username, password):
+            session['username'] = username  # Store username in session
+            return redirect(url_for('index_page'))  # Redirect to main page after successful login
+        else:
+            return "Invalid credentials", 401  # Return unauthorized if credentials are wrong
+
+    return render_template('login.html')  # Render login page
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Check if the username already exists
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
+                user = cursor.fetchone()
+                if user:
+                    return "Username already exists", 400  # Return error if username exists
+                # Register the user if not exists
+                register_user(username, password)
+                return redirect(url_for('login'))  # Redirect to login after successful registration
+        finally:
+            conn.close()
+
+    return render_template('register.html')  # Render registration page
 
 # Function to check if message contains blacklisted words
 def contains_blacklisted_word(message):
@@ -194,6 +385,8 @@ def news():
 
 @app.route('/chatroom')
 def chatroom_page():
+    if 'username' not in session:  # Check if the user is logged in
+        return redirect(url_for('login'))  # Redirect to login page if not logged in
     return render_template('chatroom.html')
 
 @app.route('/image_viewer')
