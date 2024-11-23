@@ -6,7 +6,114 @@
     <title>Games & Fake Money</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='games.css') }}">
     <style>
+        /* Style updates */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #b284cb;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
 
+        #header {
+            background-color: #b284cb;
+            color: black;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #balance {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        /* Container for the games section */
+        .games-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .game-container {
+            background-color: #999999;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-container h3 {
+            color: #333;
+        }
+
+        .game-button {
+            background-color: #afa84c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .game-button:hover {
+            background-color: #45a049;
+        }
+
+        input[type="number"], input[type="text"] {
+            padding: 10px;
+            width: 50%;
+            margin-right: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .game-result {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #d9534f;
+        }
+
+        .leaderboard-container {
+            text-align: center;
+        }
+
+        .leaderboard-container a {
+            font-size: 1.2em;
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .leaderboard-container a:hover {
+            text-decoration: underline;
+        }
+
+        /* Blackjack Game Styles */
+        #blackjack-game {
+            background-color: #999999;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        #blackjack-result {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        /* Betting Container Styling */
+        .betting-container {
+            background-color: #999999;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -16,47 +123,72 @@
         <div id="balance">Your Fake Money: $<span id="fake-money">{{ fake_money }}</span></div>
     </div>
 
-    <!-- Spin the Wheel Game -->
-    <div class="game-container">
-        <h3>Spin the Wheel</h3>
-        <p>Try your luck! Spin the wheel to win or lose some fake money!</p>
-        <button class="game-button" id="spin-wheel">Spin</button>
-        <div id="wheel-result" class="game-result"></div>
+    <!-- Betting Section (Remains in the top) -->
+    <div class="betting-container">
+        <h3>Place Your Bet (Blackjack only)</h3>
+        <input type="number" id="bet-amount" min="1" placeholder="Enter bet amount" />
+        <button class="game-button" id="place-bet">Place Bet</button>
+        <div id="bet-error" class="game-result"></div>
     </div>
 
-    <!-- Guess the Number Game -->
-    <div class="game-container">
-        <h3>Guess the Number</h3>
-        <p>Guess the correct number between 1 and 10 to win fake money!</p>
-        <input type="number" id="guess-number" min="1" max="10" placeholder="Your guess" />
-        <button class="game-button" id="submit-guess">Submit Guess</button>
-        <div id="guess-result" class="game-result"></div>
+    <!-- Container for the Games -->
+    <div class="games-container">
+
+        <!-- Spin the Wheel Game -->
+        <div class="game-container">
+            <h3>Spin the Wheel</h3>
+            <p>Try your luck! Spin the wheel to win or lose some fake money!</p>
+            <button class="game-button" id="spin-wheel">Spin</button>
+            <div id="wheel-result" class="game-result"></div>
+            <div id="spin-cooldown" class="game-result"></div> <!-- Cooldown message -->
+        </div>
+
+        <!-- Guess the Number Game -->
+        <div class="game-container">
+            <h3>Guess the Number</h3>
+            <p>Guess the correct number between 1 and 10 to win fake money!</p>
+            <input type="number" id="guess-number" min="1" max="10" placeholder="Your guess" />
+            <button class="game-button" id="submit-guess">Submit Guess</button>
+            <div id="guess-result" class="game-result"></div>
+        </div>
+
+        <!-- Blackjack Game -->
+        <div class="game-container" id="blackjack-game">
+            <h3>Blackjack</h3>
+            <p>Try your luck against the dealer! The goal is to get as close to 21 as possible without going over.</p>
+            <button class="game-button" id="start-blackjack">Start Game</button>
+            <div id="blackjack-cards"></div>
+            <button class="game-button" id="hit" disabled>Hit</button>
+            <button class="game-button" id="stand" disabled>Stand</button>
+            <div id="blackjack-result"></div>
+        </div>
+
     </div>
 
     <!-- Leaderboard Link -->
-    <div class="game-container">
+    <div class="leaderboard-container">
         <h3>Leaderboard</h3>
         <p><a href="{{ url_for('leaderboard') }}">View Leaderboard</a></p>
+
+        <h3>chatroom</h3>
+        <p><a href="{{ url_for('index_page') }}">View chatroom</a></p>
     </div>
 
     <script>
         // Fake Money system (client-side)
         let fakeMoney = {{ fake_money }}; // Initial fake money balance from the server
+        let currentBet = 0; // Track the current bet amount
+        let spinCooldown = false; // Cooldown state for spin the wheel
+        const cooldownTime = 5000; // Cooldown time in milliseconds (5 seconds)
+        let deck, playerHand, dealerHand;
 
         // Update the fake money balance on the page
         function updateFakeMoney() {
             document.getElementById('fake-money').textContent = fakeMoney;
         }
 
-        // Spin the Wheel Game
-        document.getElementById('spin-wheel').addEventListener('click', () => {
-            const result = Math.floor(Math.random() * 151) - 50; // Random win/loss amount
-            fakeMoney += result;
-            let resultText = `You ${result >= 0 ? 'won' : 'lost'} $${Math.abs(result)}!`;
-            document.getElementById('wheel-result').textContent = resultText;
-            updateFakeMoney();
-
-            // Send the updated fake money to the server
+        // Send updated fake money to the server
+        function saveFakeMoney() {
             fetch('/update_fake_money', {
                 method: 'POST',
                 headers: {
@@ -73,6 +205,52 @@
               }).catch(error => {
                   console.error('Error:', error);
               });
+        }
+
+        // Place a bet for Blackjack only
+        document.getElementById('place-bet').addEventListener('click', () => {
+            const betAmount = parseInt(document.getElementById('bet-amount').value);
+
+            // Check if the bet is valid
+            if (isNaN(betAmount) || betAmount <= 0) {
+                document.getElementById('bet-error').textContent = "Please enter a valid bet amount.";
+                return;
+            }
+
+            if (betAmount > fakeMoney) {
+                document.getElementById('bet-error').textContent = "You don't have enough fake money to place this bet.";
+                return;
+            }
+
+            currentBet = betAmount; // Set the current bet
+            document.getElementById('bet-error').textContent = ""; // Clear any errors
+            document.getElementById('bet-amount').disabled = true; // Disable bet input
+            document.getElementById('place-bet').disabled = true; // Disable bet button
+        });
+
+        // Spin the Wheel Game with Cooldown
+        document.getElementById('spin-wheel').addEventListener('click', () => {
+            if (spinCooldown) {
+                document.getElementById('spin-cooldown').textContent = "Please wait for the cooldown!";
+                return;
+            }
+
+            // Start the cooldown
+            spinCooldown = true;
+            document.getElementById('spin-cooldown').textContent = "Cooldown active... Please wait a moment.";
+
+            const result = Math.floor(Math.random() * 151) - 50; // Random win/loss amount
+            fakeMoney += result;
+            let resultText = `You ${result >= 0 ? 'won' : 'lost'} $${Math.abs(result)}!`;
+            document.getElementById('wheel-result').textContent = resultText;
+            updateFakeMoney();
+            saveFakeMoney(); // Save updated fake money
+
+            // End cooldown after the specified time
+            setTimeout(() => {
+                spinCooldown = false;
+                document.getElementById('spin-cooldown').textContent = "";
+            }, cooldownTime);
         });
 
         // Guess the Number Game
@@ -91,25 +269,124 @@
 
             document.getElementById('guess-result').textContent = resultMessage;
             updateFakeMoney();
-
-            // Send the updated fake money to the server
-            fetch('/update_fake_money', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ fake_money: fakeMoney })
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.status === 'success') {
-                      console.log('Fake money updated successfully!');
-                  } else {
-                      console.log('Error updating fake money.');
-                  }
-              }).catch(error => {
-                  console.error('Error:', error);
-              });
+            saveFakeMoney(); // Save updated fake money
         });
+
+        // Blackjack Game Logic
+        document.getElementById('start-blackjack').addEventListener('click', () => {
+            if (currentBet === 0) {
+                alert("Please place a bet first!");
+                return;
+            }
+
+            deck = createDeck();
+            shuffleDeck(deck);
+            playerHand = [deck.pop(), deck.pop()];
+            dealerHand = [deck.pop(), deck.pop()];
+
+            updateBlackjackDisplay();
+            document.getElementById('hit').disabled = false;
+            document.getElementById('stand').disabled = false;
+            document.getElementById('start-blackjack').disabled = true;
+        });
+
+        document.getElementById('hit').addEventListener('click', () => {
+            playerHand.push(deck.pop());
+            updateBlackjackDisplay();
+            const playerValue = getHandValue(playerHand);
+            if (playerValue > 21) {
+                document.getElementById('blackjack-result').textContent = `You busted! Your total value is over 21.`;
+                endBlackjack();
+            }
+        });
+
+        document.getElementById('stand').addEventListener('click', () => {
+            let dealerValue = getHandValue(dealerHand);
+            while (dealerValue < 17) {
+                dealerHand.push(deck.pop());
+                dealerValue = getHandValue(dealerHand);
+            }
+
+            updateBlackjackDisplay();
+
+            const playerValue = getHandValue(playerHand);
+            if (dealerValue > 21 || playerValue > dealerValue) {
+                const winAmount = currentBet * 2;
+                fakeMoney += winAmount;
+                document.getElementById('blackjack-result').textContent = `You win! Your total value is ${playerValue}, dealer's value is ${dealerValue}. You win $${winAmount}.`;
+                saveFakeMoney(); // Save updated fake money
+            } else if (playerValue === dealerValue) {
+                document.getElementById('blackjack-result').textContent = `It's a tie! Both have ${playerValue}.`;
+            } else {
+                fakeMoney -= currentBet;
+                document.getElementById('blackjack-result').textContent = `You lose! Your total value is ${playerValue}, dealer's value is ${dealerValue}. You lost $${currentBet}.`;
+                saveFakeMoney(); // Save updated fake money
+            }
+
+            endBlackjack();
+        });
+
+        // Helper functions for Blackjack game
+        function createDeck() {
+            const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            let deck = [];
+
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value });
+                }
+            }
+            return deck;
+        }
+
+        function shuffleDeck(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function getHandValue(hand) {
+            let value = 0;
+            let aceCount = 0;
+
+            for (let card of hand) {
+                if (card.value === 'A') {
+                    aceCount++;
+                    value += 11;
+                } else if (['K', 'Q', 'J'].includes(card.value)) {
+                    value += 10;
+                } else {
+                    value += parseInt(card.value);
+                }
+            }
+
+            while (value > 21 && aceCount > 0) {
+                value -= 10;
+                aceCount--;
+            }
+
+            return value;
+        }
+
+        function updateBlackjackDisplay() {
+            const playerCards = playerHand.map(card => `${card.value} of ${card.suit}`).join('<br>');
+            const dealerCards = dealerHand.map(card => `${card.value} of ${card.suit}`).join('<br>');
+            document.getElementById('blackjack-cards').innerHTML = `
+                <strong>Your Hand:</strong><br>${playerCards}<br>
+                <strong>Dealer's Hand:</strong><br>${dealerCards}`;
+        }
+
+        function endBlackjack() {
+            document.getElementById('hit').disabled = true;
+            document.getElementById('stand').disabled = true;
+            document.getElementById('start-blackjack').disabled = false;
+            currentBet = 0;
+            document.getElementById('bet-amount').disabled = false;
+            document.getElementById('place-bet').disabled = false;
+            document.getElementById('bet-amount').value = '';
+        }
     </script>
 
 </body>
