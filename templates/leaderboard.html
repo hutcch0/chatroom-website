@@ -4,13 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #b284cb;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1 {
+            background-color: #b284cb;
+            color: black;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .leaderboard-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #afa84c;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .rank {
+            font-weight: bold;
+            color: #afa84c;
+        }
+
+        .username {
+            color: #333;
+        }
+
+        .fake-money {
+            color: #FF5733;
+            font-weight: bold;
+        }
+
+        .leaderboard-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .leaderboard-link a {
+            text-decoration: none;
+            color: #000000;
+            font-size: 1.2em;
+        }
+
+        .leaderboard-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+
     <h1>Leaderboard</h1>
-    <ul>
-        {% for rank, data in leaderboard_data.items() %}
-            <li>Rank {{ rank }}: {{ data.username }} - ${{ data.fake_money }}</li>
-        {% endfor %}
-    </ul>
+
+    <div class="leaderboard-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Username</th>
+                    <th>Fake Money</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rank, data in leaderboard_data.items() %}
+                    <tr>
+                        <td class="rank">#{{ rank }}</td>
+                        <td class="username">{{ data.username }}</td>
+                        <td class="fake-money">${{ data.fake_money }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="leaderboard-link">
+        <a href="{{ url_for('games') }}">Back to games</a>
+    </div>
+
 </body>
 </html>
