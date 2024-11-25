@@ -75,6 +75,69 @@ def init_db():
     finally:
         conn.close()
 
+@app.route('/search_profile', methods=['GET'])
+def search_profile():
+    username = request.args.get('username')  # Get the username from the query parameter
+
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            # Fetch user details based on the provided username
+            cursor.execute("SELECT username, fake_money FROM users WHERE username = %s", (username,))
+            user_data = cursor.fetchone()
+
+            # Fetch message count for the user
+            cursor.execute("SELECT COUNT(*) as messages_count FROM messages WHERE username = %s", (username,))
+            message_count_data = cursor.fetchone()
+
+            if user_data:
+                # Prepare user data
+                user = {
+                    'username': user_data['username'],
+                    'fake_money': user_data['fake_money'],
+                    'messages_count': message_count_data['messages_count']
+                }
+            else:
+                user = None  # No user found
+
+            return render_template('profile.html', user=user)
+    except pymysql.MySQLError as e:
+        logging.error(f"Error searching profile data: {e}")
+        return "An error occurred while searching for the profile.", 500
+    finally:
+        connection.close()
+
+@app.route('/profile')
+def profile():
+    username = session.get('username')
+    if not username:
+        return redirect(url_for('login'))  # Redirect to login if not logged in
+
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            # Fetch user details
+            cursor.execute("SELECT username, fake_money FROM users WHERE username = %s", (username,))
+            user_data = cursor.fetchone()
+
+            # Fetch message count for the user
+            cursor.execute("SELECT COUNT(*) as messages_count FROM messages WHERE username = %s", (username,))
+            message_count_data = cursor.fetchone()
+
+            # Prepare user data
+            user = {
+                'username': user_data['username'],
+                'fake_money': user_data['fake_money'],
+                'messages_count': message_count_data['messages_count']
+            }
+
+            return render_template('profile.html', user=user)
+    except pymysql.MySQLError as e:
+        logging.error(f"Error fetching profile data: {e}")
+        return "An error occurred while fetching profile data.", 500
+    finally:
+        connection.close()
+
 def register_user(username, password):
     hashed_password = generate_password_hash(password)
     conn = get_db_connection()
