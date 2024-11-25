@@ -70,17 +70,23 @@
             text-align: center; /* Center align user details */
         }
 
+        /* Badge Container */
+        .badge-container {
+            display: flex; /* Use flexbox for horizontal alignment */
+            justify-content: center; /* Center the badges */
+            flex-wrap: wrap; /* Allow badges to wrap if necessary */
+            margin: 10px 0; /* Margin for the badge container */
+        }
+
         /* Badge Styles */
         .badge {
-            display: block; /* Display as a block to center it */
             background-color: #4CAF50; /* Green background for the badge */
             color: white; /* White text color */
             padding: 5px 10px; /* Padding inside the badge */
             border-radius: 12px; /* Rounded corners */
             font-size: 14px; /* Font size for the badge */
-            margin: 10px auto; /* Centering margin */
+            margin: 0 5px; /* Margin between badges */
             text-align: center; /* Center text within the badge */
-            width: fit-content; /* Adjust width to content */
         }
 
         /* Back Link Styles */
@@ -113,15 +119,40 @@
             <p><strong>Fake Money:</strong> {{ user.fake_money }}</p>
             <p><strong>Messages Sent:</strong> {{ user.messages_count }}</p>
 
-            <!-- Badge displayed below the messages count -->
-            {% if user.messages_count > 0 %}
-                <span class="badge">🏆</span>
-            {% endif %}
+            <!-- Badge Container for Messages Sent -->
+            <div class="badge-container">
+                {% if user.messages_count >= 5000 %}
+                    <span class="badge">🏆</span>
+                {% elif user.messages_count >= 1000 %}
+                    <span class="badge">🎖️</span>
+                {% elif user.messages_count >= 500 %}
+                    <span class="badge">🥇</span>
+                {% elif user.messages_count >= 100 %}
+                    <span class="badge">🥈</span>
+                {% elif user.messages_count >= 1 %}
+                    <span class="badge">🥉</span>
+                {% endif %}
+            </div>
+
+            <!-- Badge Container for Fake Money -->
+            <div class="badge-container">
+                {% if user.fake_money >= 100000 %}
+                    <span class="badge">💰</span>
+                {% elif user.fake_money >= 50000 %}
+                    <span class="badge">💸</span>
+                {% elif user.fake_money >= 10000 %}
+                    <span class="badge">💵</span>
+                {% elif user.fake_money >= 5000 %}
+                    <span class="badge">💴</span>
+                {% elif user.fake_money >= 100 %}
+                    <span class="badge">🪙</span>
+                {% endif %}
+            </div>
         {% else %}
             <p>No user found.</p>
         {% endif %}
 
-        <a href="{{ url_for('index_page') }}">Back to Chat</a>
+        <p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Back to Chat</a></p>
     </div>
 </body>
 </html>
