@@ -545,7 +545,7 @@ def delete_message_route():
 
         if message_id:
             try:
-                # Call the function to delete the message from the database
+                
                 delete_message(message_id)
                 return jsonify({'status': 'success', 'message': 'Message deleted successfully.'})
             except Exception as e:
@@ -556,13 +556,12 @@ def delete_message_route():
     else:
         return jsonify({'status': 'error', 'message': 'Invalid request format. Expected JSON.'}), 400
 
-# Logout route
+
 @app.route('/logout')
 def logout():
-    session.clear()  # Clear all session data
-    return redirect(url_for('index_page'))  # Redirect to main chatroom (index)
+    session.clear()  
+    return redirect(url_for('index_page'))  
 
-# Function to run the Flask app
 if __name__ == '__main__':
     debug_mode = os.getenv('FLASK_ENV') == 'development'
     app.run(debug=debug_mode)
