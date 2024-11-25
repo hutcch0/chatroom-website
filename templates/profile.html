@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Link to your CSS file -->
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif; /* Use a clean sans-serif font */
+            background-color: #b284cb; /* Light background color */
+            color: #333; /* Dark text color for readability */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px; /* Maximum width for the container */
+            margin: 50px auto; /* Center the container */
+            padding: 20px; /* Padding around the container */
+            background-color: #b284cb; /* Background color for the profile */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+        }
+
+        h1 {
+            text-align: center; /* Center the main title */
+            color: #fff; /* Primary color for the title */
+        }
+
+        /* Search Form Styles */
+        form {
+            display: flex; /* Use flexbox for layout */
+            justify-content: center; /* Center form items */
+            margin-bottom: 20px; /* Space below the form */
+        }
+
+        input[type="text"] {
+            padding: 10px; /* Padding inside the input */
+            width: 70%; /* Width of the input */
+            border: 1px solid #ccc; /* Border for the input */
+            border-radius: 4px; /* Rounded corners */
+            margin-right: 10px; /* Space between input and button */
+        }
+
+        button {
+            padding: 10px 15px; /* Padding for button */
+            background-color: #333; /* Dark background for the button */
+            color: white; /* White text color */
+            border: none; /* No border */
+            border-radius: 4px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s; /* Smooth background transition */
+        }
+
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        /* User Information Styles */
+        h2 {
+            text-align: center; /* Center the username */
+            color: #fff; /* Dark text color */
+        }
+
+        p {
+            font-size: 16px; /* Font size for user details */
+            margin: 5px 0; /* Margin around paragraphs */
+            text-align: center; /* Center align user details */
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: block; /* Display as a block to center it */
+            background-color: #4CAF50; /* Green background for the badge */
+            color: white; /* White text color */
+            padding: 5px 10px; /* Padding inside the badge */
+            border-radius: 12px; /* Rounded corners */
+            font-size: 14px; /* Font size for the badge */
+            margin: 10px auto; /* Centering margin */
+            text-align: center; /* Center text within the badge */
+            width: fit-content; /* Adjust width to content */
+        }
+
+        /* Back Link Styles */
+        a {
+            display: block; /* Block display for link */
+            text-align: center; /* Center align the link */
+            margin-top: 20px; /* Space above the link */
+            color: #fff; /* Green color for the link */
+            text-decoration: none; /* No underline */
+            font-weight: bold; /* Bold text */
+        }
+
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Profile</h1>
+
+        <!-- Search Form -->
+        <form action="{{ url_for('search_profile') }}" method="GET">
+            <input type="text" name="username" placeholder="Search for a user" required>
+            <button type="submit">Search</button>
+        </form>
+
+        {% if user %}
+            <h2>{{ user.username }}</h2>
+            <p><strong>Fake Money:</strong> {{ user.fake_money }}</p>
+            <p><strong>Messages Sent:</strong> {{ user.messages_count }}</p>
+
+            <!-- Badge displayed below the messages count -->
+            {% if user.messages_count > 0 %}
+                <span class="badge">🏆</span>
+            {% endif %}
+        {% else %}
+            <p>No user found.</p>
+        {% endif %}
+
+        <a href="{{ url_for('index_page') }}">Back to Chat</a>
+    </div>
+</body>
+</html>
