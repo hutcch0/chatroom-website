@@ -1,78 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif; /* Clean font */
+            background-color: #b284cb; /* Light background color */
+            color: #333; /* Dark text for readability */
+            margin: 0;
+            padding: 20px; /* Padding around the body */
+            text-align: center; /* Center align text */
+        }
+
+        h1 {
+            color: #333; /* Green title color */
+            margin-bottom: 20px; /* Space below title */
+        }
+
+        p {
+            margin: 5px 0; /* Margin for paragraphs */
+        }
+
+        input[type="text"] {
+            padding: 10px; /* Padding inside the input */
+            width: 300px; /* Fixed width for the input */
+            border: 2px solid #333; /* Green border */
+            border-radius: 5px; /* Rounded corners */
+            margin-right: 10px; /* Space between input and button */
+        }
+
+        button {
+            padding: 10px 15px; /* Button padding */
+            background-color: #333; /* Green background for the button */
+            color: white; /* White text */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        #image-container {
+            margin-top: 20px; /* Space above the image */
+        }
+
+        img {
+            max-width: 100%; /* Responsive image */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 8px; /* Rounded corners for the image */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+
+        .image-list {
+            margin-top: 20px; /* Space above the image list */
+            max-width: 600px; /* Limit width of the list */
+            margin: 0 auto; /* Center the list */
+            text-align: left; /* Align text to the left */
+        }
+    </style>
 </head>
 <body>
     <h1>Image Viewer</h1>
-    <p>do /images/Angry.png or</p>
-	<p>AwOo.png</p>
-	<p>GRIN_ZERO_TWO.png</p>
-	<p>Hehe.png</p>
-	<p>KannaWhat.png</p>
-	<p>MadokaLewd.png</p>
-	<p>NepSmug.png</p>
-	<p>OH_zero_two_die.png</p>
-	<p>Ryukosip.png</p>
-	<p>SagiriShy.png</p>
-	<p>Zero_Two (2).png</p>
-	<p>Zero_Two_Dead.png</p>
-	<p>Zero_Two_Dumb.png</p>
-	<p>Zero_Two_Face_Palm.png</p>
-	<p>Zero_Two_Hi.png</p>
-	<p>Zero_Two_Look.png</p>
-	<p>Zero_Two_Music.png</p>
-	<p>Zero_Two_Peak.png</p>
-	<p>Zero_Two_Shrug.png</p>
-	<p>Zero_Two_Thanos.png</p>
-	<p>Zero_two(3).png</p>
-	<p>Zero_two_fbi.png</p>
-	<p>animeangry.png</p>
-	<p>aquacry.png</p>
-	<p>awoothink.png</p>
-	<p>baka.png</p>
-	<p>blushwow.png</p>
-	<p>flandre_concerned.png</p>
-	<p>headpat.png</p>
-	<p>kannabear.png</p>
-	<p>lmao.png</p>
-	<p>lurk.png</p>
-	<p>mashahello.png</p>
-	<p>ohmy.png</p>
-	<p>zero_two(1).png</p>
-	<p>zero_two.png</p>
-	<p>zero_two_Stab.png</p>
-	<p>zero_two_ayaya.png</p>
-	<p>zero_two_blanket.png</p>
-	<p>zero_two_blindfold.png</p>
-	<p>zero_two_blush.png</p>
-	<p>zero_two_body_pillow.png</p>
-	<p>zero_two_cheer.png</p>
-	<p>zero_two_coracao.png</p>
-	<p>zero_two_cry.png</p>
-	<p>zero_two_fire_mad.png</p>
-	<p>zero_two_idk.png</p>
-	<p>zero_two_is_bored.png</p>
-	<p>zero_two_kiss.png</p>
-	<p>zero_two_nom.png</p>
-	<p>zero_two_notes.png</p>
-	<p>zero_two_please.png</p>
-	<p>zero_two_rainbow_sick.png</p>
-	<p>zero_two_refuse.png</p>
-	<p>zero_two_salute.png</p>
-	<p>zero_two_shhh.png</p>
-	<p>zero_two_shy.png</p>
-	<p>zero_two_sip.png</p>
-	<p>zero_two_sleep.png</p>
-	<p>zero_two_smile.png</p>
-	<p>zero_two_think.png</p>
-	<p>Zero_two_Ohmygod_DKZ.png</p>
-    <p>just do /images/ then whatever png you want</p>
+    <p>Type the image filename or select one from the list below:</p>
 
     <input type="text" id="filename-input" placeholder="Enter image filename (e.g., Angry.png)">
     <button onclick="showImage()">Show Image</button>
 
     <div id="image-container"></div>
+
+    <div class="image-list">
+        <p>Available Images:</p>
+        <p>Angry.png</p>
+        <p>AwOo.png</p>
+        <p>GRIN_ZERO_TWO.png</p>
+        <p>Hehe.png</p>
+        <p>KannaWhat.png</p>
+        <p>MadokaLewd.png</p>
+        <p>NepSmug.png</p>
+        <p>OH_zero_two_die.png</p>
+        <p>Ryukosip.png</p>
+        <p>SagiriShy.png</p>
+        <p>Zero_Two (2).png</p>
+        <p>Zero_Two_Dead.png</p>
+        <p>Zero_Two_Dumb.png</p>
+        <p>Zero_Two_Face_Palm.png</p>
+        <p>Zero_Two_Hi.png</p>
+        <p>Zero_Two_Look.png</p>
+        <p>Zero_Two_Music.png</p>
+        <p>Zero_Two_Peak.png</p>
+        <p>Zero_Two_Shrug.png</p>
+        <p>Zero_Two_Thanos.png</p>
+        <p>Zero_two(3).png</p>
+        <p>Zero_two_fbi.png</p>
+        <p>animeangry.png</p>
+        <p>aquacry.png</p>
+        <p>awoothink.png</p>
+        <p>baka.png</p>
+        <p>blushwow.png</p>
+        <p>flandre_concerned.png</p>
+        <p>headpat.png</p>
+        <p>kannabear.png</p>
+        <p>lmao.png</p>
+        <p>lurk.png</p>
+        <p>mashahello.png</p>
+        <p>ohmy.png</p>
+        <p>zero_two(1).png</p>
+        <p>zero_two.png</p>
+        <p>zero_two_Stab.png</p>
+        <p>zero_two_ayaya.png</p>
+        <p>zero_two_blanket.png</p>
+        <p>zero_two_blindfold.png</p>
+        <p>zero_two_blush.png</p>
+        <p>zero_two_body_pillow.png</p>
+        <p>zero_two_cheer.png</p>
+        <p>zero_two_coracao.png</p>
+        <p>zero_two_cry.png</p>
+        <p>zero_two_fire_mad.png</p>
+        <p>zero_two_idk.png</p>
+        <p>zero_two_is_bored.png</p>
+        <p>zero_two_kiss.png</p>
+        <p>zero_two_nom.png</p>
+        <p>zero_two_notes.png</p>
+        <p>zero_two_please.png</p>
+        <p>zero_two_rainbow_sick.png</p>
+        <p>zero_two_refuse.png</p>
+        <p>zero_two_salute.png</p>
+        <p>zero_two_shhh.png</p>
+        <p>zero_two_shy.png</p>
+        <p>zero_two_sip.png</p>
+        <p>zero_two_sleep.png</p>
+        <p>zero_two_smile.png</p>
+        <p>zero_two_think.png</p>
+        <p>Zero_two_Ohmygod_DKZ.png</p>
+    </div>
 
     <script>
         function showImage() {
@@ -84,9 +149,20 @@
             img.src = imageUrl;
             img.alt = filename;
 
+            // Clear previous images
             imageContainer.innerHTML = '';
+
+            // Add error handling for image loading
+            img.onerror = function() {
+                imageContainer.innerHTML = `<p style="color: red;">Image not found: ${filename}</p>`;
+            };
+
             imageContainer.appendChild(img);
         }
     </script>
+
+    <footer>
+        <p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p>
+    </footer>
 </body>
 </html>
