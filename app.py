@@ -236,6 +236,9 @@ def update_fake_money_in_db(username, fake_money):
     cursor.close()
     connection.close()
 
+@app.route('/down')
+def down_page():
+    return render_template('down.html')
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -459,15 +462,20 @@ def image_viewer():
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/', methods=['GET', 'POST'])
 def index_page():
-    if request.method == 'POST':
-        message_content = request.form['message']
-        username = session.get('username', 'Guest')
-        if message_content:
-            save_message(message_content, username)
-            return redirect(url_for('index'))  # Redirect to the index page after message is sent
+    try:
+        if request.method == 'POST':
+            message_content = request.form['message']
+            username = session.get('username', 'Guest')
+            if message_content:
+                save_message(message_content, username)
+                return redirect(url_for('index'))  # Redirect to the index page after message is sent
 
-    messages = load_messages()  # Load all messages from the database
-    return render_template('index.html', messages=messages)  # Render the index template
+        messages = load_messages()  # Load all messages from the database
+        return render_template('index.html', messages=messages)  # Render the index template
+
+    except Exception as e:
+        logging.error(f"Error occurred on the index page: {e}")
+        return redirect(url_for('down_page'))  # Redirect to down page if there's an error
 
 # Admin chatroom page
 @app.route('/admin/chat', methods=['GET', 'POST'])
@@ -545,7 +553,7 @@ def delete_message_route():
 
         if message_id:
             try:
-                
+
                 delete_message(message_id)
                 return jsonify({'status': 'success', 'message': 'Message deleted successfully.'})
             except Exception as e:
@@ -559,8 +567,8 @@ def delete_message_route():
 
 @app.route('/logout')
 def logout():
-    session.clear()  
-    return redirect(url_for('index_page'))  
+    session.clear()
+    return redirect(url_for('index_page'))
 
 if __name__ == '__main__':
     debug_mode = os.getenv('FLASK_ENV') == 'development'
