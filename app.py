@@ -236,9 +236,9 @@ def update_fake_money_in_db(username, fake_money):
     cursor.close()
     connection.close()
 
-@app.route('/down')
-def down_page():
-    return render_template('down.html')
+@app.route('/blog')
+def blog():
+    return render_template('blog.html')
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -433,22 +433,6 @@ def admin_login():
 
     return render_template('admin.html')  # Render admin login page
 
-@app.route('/about')
-def about():
-    try:
-        return render_template('about.html')
-    except Exception as e:
-        logging.error(f"Error rendering about page: {traceback.format_exc()}")
-        return "An internal error has occurred!", 500
-
-@app.route('/news')
-def news():
-    try:
-        return render_template('news.html')
-    except Exception as e:
-        logging.error(f"Error rendering news page: {traceback.format_exc()}")
-        return "An internal error has occurred!", 500
-
 @app.route('/chatroom')
 def chatroom_page():
     if 'username' not in session:  # Check if the user is logged in
@@ -462,20 +446,15 @@ def image_viewer():
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/', methods=['GET', 'POST'])
 def index_page():
-    try:
-        if request.method == 'POST':
-            message_content = request.form['message']
-            username = session.get('username', 'Guest')
-            if message_content:
-                save_message(message_content, username)
-                return redirect(url_for('index'))  # Redirect to the index page after message is sent
+    if request.method == 'POST':
+        message_content = request.form['message']
+        username = session.get('username', 'Guest')
+        if message_content:
+            save_message(message_content, username)
+            return redirect(url_for('index'))  # Redirect to the index page after message is sent
 
-        messages = load_messages()  # Load all messages from the database
-        return render_template('index.html', messages=messages)  # Render the index template
-
-    except Exception as e:
-        logging.error(f"Error occurred on the index page: {e}")
-        return redirect(url_for('down_page'))  # Redirect to down page if there's an error
+    messages = load_messages()  # Load all messages from the database
+    return render_template('index.html', messages=messages)  # Render the index template
 
 # Admin chatroom page
 @app.route('/admin/chat', methods=['GET', 'POST'])
