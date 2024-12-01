@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+/* Add a gray background color with some padding */
+body {
+  font-family: Arial;
+  padding: 20px;
+  background: #08030d;
+}
+
+/* Header/Blog Title */
+.header {
+  padding: 30px;
+  font-size: 40px;
+  text-align: center;
+  background: #08030d;
+  color: #0a999e;
+}
+
+/* Create two unequal columns that floats next to each other */
+/* Left column */
+.leftcolumn {
+  float: left;
+  width: 75%;
+}
+
+/* Right column */
+.rightcolumn {
+  float: left;
+  width: 25%;
+  padding-left: 20px;
+}
+
+/* Fake image */
+.fakeimg {
+  background-color: #aaa;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Add a card effect for articles */
+.card {
+   background-color: #08030d;
+   color: #0a999e;
+   padding: 20px;
+   margin-top: 20px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Footer */
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: #08030d;
+  color: #0a999e;
+  margin-top: 20px;
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 800px) {
+  .leftcolumn, .rightcolumn {
+    width: 100%;
+    padding: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>Welcome to My Blog</h2>
+</div>
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="card">
+      <h2>Introduction</h2>
+      <h5>Posted on: December 1, 2024</h5>
+	  <p>I built this chatroom because I wanted a fun, independent space to connect with people online and put my coding skills to the test.</p>
+    </div>
+    <div class="card">
+      <h2>v1.04</h2>
+      <h5>Posted on: December 1, 2024</h5>
+            <p>got rid of news page</p>
+			<p>got rid of about me page</p>
+			<p>made a blog page</p>
+			<p>redid the games page</p>
+			<p>added Rock, Paper, Scissors game (it doesnt give money)</p>
+			<p>added Higher or Lower game (does give money)</p>
+			<p>added Memory Card Game doesnt give money</p>
+			<p>changed game page title</p>
+    </div>
+    <div class="card">
+      <h2>v1.03</h2>
+      <h5>Posted on: December 1, 2024</h5>
+            <p>now we have pictures you can use(use image_finder to see all of them and how to use them)</p>
+            <p>a custom user name feature.</p>
+            <p>added games and a leaderboard</p>
+            <p>redid games page</p>
+            <p>redid the leaderboard page</p>
+            <p>added blackjack</p>
+            <p>added spin the wheel</p>
+            <p>added guess the number</p>
+            <p>first bit done for the bot just need to do part two that connect the two together</p>
+            <p>added Badges</p>
+            <p>added a user profile</p>
+            <p>added a drop down-menu on the main chatroom page to clean-up the buttons</p>
+            <p>🥉badge of 1 message sent</p>
+            <p>🥈badge of 100 messages sent</p>
+            <p>🥇badge of 500 messages sent</p>
+            <p>🎖️badge of 1,000 messages sent️</p>
+            <p>🏆badge of 5,000 messages sent</p>
+            <p>🪙badge of 100 fake money</p>
+            <p>💴badge of 5,000 fake money</p>
+            <p>💵badge of 10,000 fake money</p>
+            <p>💸badge of 50,000 fake money</p>
+            <p>💰badge of 100,000 fake money</p>
+            <p>redid the about page</p>
+    </div>
+    <div class="card">
+      <h2>past updates</h2>
+      <h5>v1.02 | Posted on: December 1, 2024</h5>
+            <p>Added about the project page.</p>
+            <p>Added news page.</p>
+            <p>Cleaned the front chatroom up.</p>
+            <p>Cleaned the code up.</p>
+            <p>Runs faster.</p>
+            <p>Fixed bugs.</p>
+            <p>Added a database.</p>
+            <p>Character limit (1000 Characters).</p>
+            <p>Adding a user name feature.</p>
+            <p>fixed the news page now the title shows</p>
+            <p>now updates in real time after 3 seconds</p>
+            <p>Moderation features</p>
+            <p>changed the background colour</p>
+            <p>updated the about me page</p>
+            <p>Word filters</p>
+            <p>rules page</p>
+    </div>
+    <div class="card">
+      <h2>Planned Updates</h2>
+      <h5>Posted on: December 1, 2024</h5>
+            <p>Adding button for changing colour.</p>
+            <p>Adding a button for suggestions.</p>
+            <p>Emojis and Reactions</p>
+            <p>Special Effects</p>
+            <p>have a forum</p>
+            <p>Chatroom Achievements</p>
+            <p>Hidden Easter Eggs</p>
+            <p>Debate Nights/Talent Shows</p>
+            <p>Time Capsule</p>
+            <p>Whisper Mode</p>
+            <p>Chatroom Mascot</p>
+            <p>Morse Code Mode</p>
+            <p>Emoji-Only Communication</p>
+            <p>Live Polls and Surveys</p>
+            <p>Time-Limited Chatrooms</p>
+    </div>
+    <div class="card">
+      <h2>bugs fixed</h2>
+      <h5>Posted on: December 1, 2024</h5>
+            <p>Fix code: Information exposure through an exception</p>
+            <p>Fix code: Flask app is run in debug mode</p>
+            <p>fix: Werkzeug debugger vulnerable to remote execution when interacting with attacker controlled domain</p>
+            <p>fixed the word you being in the blacklist</p>
+    </div>
+  </div>
+  <div class="rightcolumn">
+    <div class="card">
+      <h2>links</h2>
+        <a href="{{ url_for('index_page') }}">Chatroom</a></p>
+        <a href="{{ url_for('rules') }}">Rules</a>
+    </div>
+    <div class="card">
+      <h3>Where to find us</h3>
+ 		<p>we have this chatroom, x(twitter) and my other website
+           <ul>
+               <li><a href="https://hutcch.eu.pythonanywhere.com/">the chatroom</a></li>
+               <li><a href="https://x.com/chatroombyHVN">x(twitter)</a></li>
+               <li><a href="https://hutcch.neocities.org/">my other website</a></li>
+           </ul>
+    </div>
+    <div class="card">
+      <h3>Contact</h3>
+      <p>If you have any questions or feedback, feel free to contact us at <a href="8hqz5hgfb@mozmail.com">8hqz5hgfb@mozmail.com</a> also the files are on github <a href="https://github.com/hutcch0/chatroom-website/tree/main">website</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <h2><p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p></h2>
+</div>
+
+</body>
+</html>
