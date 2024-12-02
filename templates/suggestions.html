@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Your Suggestion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/suggestions.css') }}">
+    <style>
+        .container {
+            text-align: center;
+            background-color: #1e121b; /* A darker background for the form */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Submit Your Suggestion</h1>
+        <form action="/submit_suggestion" method="POST">
+            <label for="suggestion">Your Suggestion:</label><br>
+            <textarea id="suggestion" name="suggestion" placeholder="Enter your suggestion here..."></textarea><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
