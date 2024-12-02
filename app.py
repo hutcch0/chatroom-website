@@ -10,9 +10,9 @@ import re
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = 'no'  # Replace with a strong, random secret key
+app.secret_key = 'no'
 
-# Function to connect to the database
+
 def get_db_connection():
     try:
         return pymysql.connect(
@@ -26,7 +26,7 @@ def get_db_connection():
         logging.error(f"Database connection error: {e}")
         return None
 
-# Initialize the database only on the first request
+
 @app.before_first_request
 def init_db():
     conn = get_db_connection()
@@ -75,30 +75,44 @@ def init_db():
     finally:
         conn.close()
 
+@app.route('/suggestions')
+def suggestions():
+    return render_template('suggestions.html')
+
+@app.route('/submit_suggestion', methods=['POST'])
+def submit_suggestion():
+
+    suggestion = request.form['suggestion']
+
+
+    with open('/home/hutcch/chatroom/suggestionstore/suggestions.txt', 'a') as f:
+        f.write(suggestion + '\n')
+
+    return "Thank you for your suggestion! <a href='/'>Go back</a>"
+
 @app.route('/search_profile', methods=['GET'])
 def search_profile():
-    username = request.args.get('username')  # Get the username from the query parameter
+    username = request.args.get('username')
 
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            # Fetch user details based on the provided username
+
             cursor.execute("SELECT username, fake_money FROM users WHERE username = %s", (username,))
             user_data = cursor.fetchone()
 
-            # Fetch message count for the user
             cursor.execute("SELECT COUNT(*) as messages_count FROM messages WHERE username = %s", (username,))
             message_count_data = cursor.fetchone()
 
             if user_data:
-                # Prepare user data
+
                 user = {
                     'username': user_data['username'],
                     'fake_money': user_data['fake_money'],
                     'messages_count': message_count_data['messages_count']
                 }
             else:
-                user = None  # No user found
+                user = None
 
             return render_template('profile.html', user=user)
     except pymysql.MySQLError as e:
