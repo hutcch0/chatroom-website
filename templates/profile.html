@@ -50,6 +50,14 @@
                     <span class="badge">🪙</span>
                 {% endif %}
             </div>
+
+            <!-- December Special Badge -->
+            {% if now.month == 12 %}
+                <div class="badge-container">
+                    <span class="badge">🎄 December Special Badge 🎄</span>
+                </div>
+            {% endif %}
+
         {% else %}
             <p>No user found.</p>
         {% endif %}
