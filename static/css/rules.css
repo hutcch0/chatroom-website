@@ -3,18 +3,18 @@
 /* Style for the News page title above the content box */
 .page-title {
     font-size: 36px;
-    color: #333;
+    color: #0a999e;
     text-align: center;
-    margin-top: 40px; /* Add some space from the top of the page */
-    margin-bottom: 20px; /* Space between title and content box */
+    margin-top: 40px;
+    margin-bottom: 20px;
     text-transform: uppercase;
-    letter-spacing: 2px; /* Optional: add some letter spacing for a more modern look */
+    letter-spacing: 2px;
 }
 
 /* Center the entire content on the page */
 body {
     font-family: Arial, sans-serif;
-    background-color: #b284cb;
+    background-color: #08030d;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -25,24 +25,24 @@ body {
 }
 
 .content {
-    background-color: #fff;  /* White background for the content */
+    background-color: #08030d;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 80%;
     max-width: 800px;
-    text-align: center;  /* Center the content */
+    text-align: center;
 }
 
 h2 {
     font-size: 24px;
-    color: #333;
+    color: #0a999e;
     margin-bottom: 20px;
 }
 
 p {
     font-size: 18px;
-    color: #555;
+    color: #0a999e;
     margin-bottom: 12px;
 }
 
@@ -50,7 +50,7 @@ footer {
     text-align: center;
     font-size: 14px;
     margin-top: 30px;
-    color: #888;
+    color: #0a999e;
 }
 
 footer a {
