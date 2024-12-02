@@ -75,6 +75,10 @@ def init_db():
     finally:
         conn.close()
 
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
 @app.route('/suggestions')
 def suggestions():
     return render_template('suggestions.html')
@@ -125,20 +129,20 @@ def search_profile():
 def profile():
     username = session.get('username')
     if not username:
-        return redirect(url_for('login'))  
+        return redirect(url_for('login'))
 
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            
+
             cursor.execute("SELECT username, fake_money FROM users WHERE username = %s", (username,))
             user_data = cursor.fetchone()
 
-            
+
             cursor.execute("SELECT COUNT(*) as messages_count FROM messages WHERE username = %s", (username,))
             message_count_data = cursor.fetchone()
 
-            
+
             user = {
                 'username': user_data['username'],
                 'fake_money': user_data['fake_money'],
@@ -181,14 +185,14 @@ def add_fake_money_column():
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            
+
             cursor.execute("SHOW COLUMNS FROM users LIKE 'fake_money';")
             result = cursor.fetchone()
 
             if result:
                 print("Column 'fake_money' already exists.")
             else:
-                
+
                 add_column_query = """
                     ALTER TABLE users
                     ADD COLUMN fake_money INT DEFAULT 0;
@@ -205,7 +209,7 @@ def add_fake_money_column():
 add_fake_money_column()
 
 def get_fake_money(username):
-    
+
     connection = get_db_connection()
     if connection:
         cursor = connection.cursor()
@@ -215,15 +219,15 @@ def get_fake_money(username):
         connection.close()
 
         if result:
-            return result['fake_money']  
+            return result['fake_money']
         else:
-            return 0  
+            return 0
     else:
-        return 0  
+        return 0
 
 @app.route('/games')
 def games():
-    username = session.get('username', None)  
+    username = session.get('username', None)
     if username:
         fake_money = get_fake_money(username)
         return render_template('games.html', username=username, fake_money=fake_money)
@@ -236,13 +240,13 @@ def update_fake_money():
         data = request.get_json()
         fake_money = data['fake_money']
         username = session['username']
-        
+
         update_fake_money_in_db(username, fake_money)
         return jsonify({'status': 'success'})
     return jsonify({'status': 'failure', 'message': 'User not logged in'})
 
 def update_fake_money_in_db(username, fake_money):
-    
+
     connection = get_db_connection()
     cursor = connection.cursor()
     cursor.execute("UPDATE users SET fake_money = %s WHERE username = %s", (fake_money, username))
@@ -262,7 +266,7 @@ def leaderboard():
             cursor.execute("SELECT username, fake_money FROM users ORDER BY fake_money DESC LIMIT 10")
             leaderboard_data = cursor.fetchall()
 
-            
+
             leaderboard_data = {index + 1: {'username': data['username'], 'fake_money': data['fake_money']}
                                  for index, data in enumerate(leaderboard_data)}
 
@@ -279,7 +283,7 @@ def update_score():
         return jsonify({'status': 'error', 'message': 'User not logged in'}), 401
 
     username = session['username']
-    score = request.form['score'] 
+    score = request.form['score']
 
     conn = get_db_connection()
     try:
@@ -302,38 +306,38 @@ def login():
         password = request.form['password']
 
         if verify_user_credentials(username, password):
-            session['username'] = username  
-            return redirect(url_for('index_page'))  
+            session['username'] = username
+            return redirect(url_for('index_page'))
         else:
-            return "Invalid credentials", 401  
+            return "Invalid credentials", 401
 
-    return render_template('login.html')  
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+
         conn = get_db_connection()
         try:
             with conn.cursor() as cursor:
                 cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
                 user = cursor.fetchone()
                 if user:
-                    return "Username already exists", 400  
-                
+                    return "Username already exists", 400
+
                 register_user(username, password)
                 return redirect(url_for('login'))
         finally:
             conn.close()
 
-    return render_template('register.html')  
+    return render_template('register.html')
 
 
 def contains_blacklisted_word(message):
     for word in config.BLACKLIST:
-        
+
         if re.search(r'\b' + re.escape(word) + r'\b', message, re.IGNORECASE):
             return True
     return False
@@ -354,7 +358,7 @@ def upload_image():
         return jsonify({'error': 'No selected file'}), 400
     if file:
 
-        filename = secure_filename(file.filename) 
+        filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         return jsonify({'image_url': f'/images/{filename}'})
@@ -362,7 +366,7 @@ def upload_image():
 def load_blacklist(file_path):
     try:
         with open(file_path, 'r') as file:
-            
+
             blacklist = [line.strip().lower() for line in file.readlines()]
         return blacklist
     except Exception as e:
@@ -374,7 +378,7 @@ BLACKLIST = load_blacklist('blacklist.txt')
 
 def contains_blacklisted_word(message):
     for word in BLACKLIST:
-        
+
         if re.search(r'\b' + re.escape(word) + r'\b', message, re.IGNORECASE):
             return True
     return False
@@ -391,7 +395,7 @@ def delete_message(message_id):
                 logging.info(f"Message with ID {message_id} deleted.")
     except Exception as e:
         logging.error(f"Error deleting message: {e}")
-        conn.rollback()  
+        conn.rollback()
     finally:
         conn.close()
 
@@ -403,7 +407,7 @@ def load_messages():
             cursor.execute('SELECT id, content, username FROM messages ORDER BY id ASC')
             messages = cursor.fetchall()
 
-            
+
             for message in messages:
                 if contains_blacklisted_word(message['content']):
                     message['content'] = '[Message removed for inappropriate content]'
@@ -439,17 +443,17 @@ def admin_login():
 
         if verify_admin_credentials(username, password):
             session['is_admin'] = True
-            session['username'] = 'System'  
-            return redirect(url_for('admin_chat'))  
+            session['username'] = 'System'
+            return redirect(url_for('admin_chat'))
 
-        return "Invalid credentials", 401  
+        return "Invalid credentials", 401
 
     return render_template('admin.html')
 
 @app.route('/chatroom')
 def chatroom_page():
-    if 'username' not in session:  
-        return redirect(url_for('login'))  
+    if 'username' not in session:
+        return redirect(url_for('login'))
     return render_template('chatroom.html')
 
 @app.route('/image_viewer')
@@ -464,52 +468,52 @@ def index_page():
         username = session.get('username', 'Guest')
         if message_content:
             save_message(message_content, username)
-            return redirect(url_for('index'))  
+            return redirect(url_for('index'))
 
-    messages = load_messages()  
-    return render_template('index.html', messages=messages)  
+    messages = load_messages()
+    return render_template('index.html', messages=messages)
 
 
 @app.route('/admin/chat', methods=['GET', 'POST'])
 def admin_chat():
-    
+
     if not session.get('is_admin'):
-        return redirect(url_for('index_page'))  
+        return redirect(url_for('index_page'))
 
     if request.method == 'POST':
-        message_content = request.json.get('message')  
+        message_content = request.json.get('message')
         if message_content:
-            save_message(message_content, 'System')  
-            return jsonify({'status': 'success'})  
+            save_message(message_content, 'System')
+            return jsonify({'status': 'success'})
 
-    
+
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         messages = load_messages()
-        return jsonify({'messages': messages})  
+        return jsonify({'messages': messages})
 
-    
+
     messages = load_messages()
     return render_template('admin_chat.html', messages=messages)
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
-    data = request.get_json()  
+    data = request.get_json()
     message_content = data.get('message')
-    username = session.get('username', 'Guest') 
+    username = session.get('username', 'Guest')
 
-   
+
     if len(message_content) > 1000:
         return jsonify({'status': 'error', 'message': 'Message exceeds the 1000 character limit'}), 400
 
-    
+
     if contains_blacklisted_word(message_content):
         return jsonify({'status': 'error', 'message': 'Your message contains inappropriate words.'}), 400
 
-    
-    if message_content:
-        save_message(message_content, username)  
 
-        
+    if message_content:
+        save_message(message_content, username)
+
+
         return jsonify({'status': 'success', 'message': f'{username}: {message_content}'})
     else:
         return jsonify({'status': 'error', 'message': 'No message content provided'}), 400
@@ -523,10 +527,10 @@ def save_message(content, username=None):
                 'INSERT INTO messages (content, username) VALUES (%s, %s)',
                 (content, username)
             )
-            
+
             message_id = cursor.lastrowid
         conn.commit()
-        return message_id  
+        return message_id
     finally:
         conn.close()
 
@@ -534,7 +538,7 @@ def save_message(content, username=None):
 @app.route('/poll_messages', methods=['GET'])
 def poll_messages():
     messages = load_messages()
-    return jsonify({'messages': messages})  
+    return jsonify({'messages': messages})
 
 
 @app.route('/admin/delete_message', methods=['POST'])
