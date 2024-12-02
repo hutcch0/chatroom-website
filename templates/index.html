@@ -45,7 +45,7 @@
             top: 0; /* Align at the top */
             left: 0; /* Align to the left of the screen */
             right: 0; /* Align to the right of the screen */
-            background-color: #b284cb; /* Set background color for header */
+            background-color: #08030d; /* Set background color for header */
             z-index: 1000; /* Ensure the header stays on top */
         }
 
@@ -53,6 +53,7 @@
             display: flex;
             flex-direction: column; /* Stack title and subtitle vertically */
             align-items: center; /* Center items */
+            color: #0a999e;
         }
 
         #title img {
@@ -74,15 +75,15 @@
 
         #top-right-links a {
             text-decoration: none; /* Remove underline from links */
-            background-color: #4CAF50; /* Button background color */
-            color: white; /* Button text color */
+            background-color: #212121; /* Button background color */
+            color: #0a999e; /* Button text color */
             padding: 10px 15px; /* Padding for the button */
             border-radius: 5px; /* Round the corners */
             transition: background-color 0.3s; /* Smooth background transition */
         }
 
         #top-right-links a:hover {
-            background-color: #45a049; /* Darken the button color on hover */
+            background-color: #212121; /* Darken the button color on hover */
         }
 
         /* Dropdown Menu Styles */
@@ -91,7 +92,7 @@
             position: absolute; /* Position relative to the button */
             top: 100%; /* Position it below the button */
             right: 0; /* Align to the right */
-            background-color: white; /* Background color */
+            background-color: #08030d; /* Background color */
             border: 1px solid #ccc; /* Border for the dropdown */
             border-radius: 5px; /* Round the corners */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for dropdown */
@@ -101,17 +102,17 @@
         #dropdown-menu a {
             display: block; /* Make links block elements */
             padding: 10px 15px; /* Padding for dropdown items */
-            color: black; /* Text color */
+            color: #0a999e;
         }
 
         #dropdown-menu a:hover {
-            background-color: #f0f0f0; /* Background color on hover */
+            background-color: #08030d; /* Background color on hover */
         }
 
         #toggle-menu-button {
             padding: 10px 15px; /* Padding for the toggle button */
-            background-color: #4CAF50; /* Button background color */
-            color: white; /* Button text color */
+            background-color: #212121; /* Button background color */
+            color: #0a999e; /* Button text color */
             border: none; /* No border */
             border-radius: 5px; /* Round the corners */
             cursor: pointer; /* Pointer on hover */
@@ -119,7 +120,7 @@
         }
 
         #toggle-menu-button:hover {
-            background-color: #45a049; /* Darken the button color on hover */
+            background-color: #000; /* Darken the button color on hover */
         }
 
         #chat {
@@ -135,7 +136,7 @@
         <div id="header">
             <div id="title">
                 <img src="{{ url_for('static', filename='chat_icon.jpg') }}" alt="Chatroom Logo">
-                <div id="chatroom-title">Chatroom v1.03 - Welcome, {{ session['username'] }}</div>
+                <div id="chatroom-title">Chatroom v1.04 - Welcome, {{ session['username'] }}</div>
             </div>
             <div id="top-right-links">
                 <button id="toggle-menu-button" onclick="toggleDropdown()">Menu</button>
@@ -144,8 +145,7 @@
                     <a href="{{ url_for('games') }}">Games</a>
                     <a href="{{ url_for('profile') }}">Profile</a>
                     <a href="{{ url_for('image_viewer') }}">View Images</a>
-                    <a href="{{ url_for('about') }}">About</a>
-                    <a href="{{ url_for('news') }}">News</a>
+                    <a href="{{ url_for('blog') }}">blog</a>
                     <a href="{{ url_for('logout') }}">Logout</a>
                 </div>
             </div>
