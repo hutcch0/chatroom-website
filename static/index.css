@@ -3,7 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color:  #b284cb;  
+    background-color: #08030d;
     height: 100vh;
     overflow: auto; /* Allow scrolling */
     display: flex;
@@ -38,6 +38,7 @@ body {
     display: flex;
     align-items: center; /* Keep the title and image on the same line */
     margin-bottom: 20px;
+    color: #0a999e;
 }
 
 #chatroom-title img {
@@ -60,6 +61,7 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
+    color: #0a999e;
 }
 
 /* Make sure each message appears on its own line */
