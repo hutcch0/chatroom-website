@@ -4,72 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Viewer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif; /* Clean font */
-            background-color: #08030d; /* Dark background color */
-            color: #333; /* Default text color for readability */
-            margin: 0;
-            padding: 20px; /* Padding around the body */
-            text-align: center; /* Center align text */
-        }
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/image_viewer.css') }}">
 
-        h1 {
-            color: #0a999e; /* Set title color to #0a999e */
-            margin-bottom: 20px; /* Space below title */
-        }
-
-        p {
-            margin: 5px 0; /* Margin for paragraphs */
-        }
-
-        input[type="text"] {
-            padding: 10px; /* Padding inside the input */
-            width: 300px; /* Fixed width for the input */
-            border: 2px solid #0a999e; /* Border color */
-            border-radius: 5px; /* Rounded corners */
-            margin-right: 10px; /* Space between input and button */
-        }
-
-        button {
-            padding: 10px 15px; /* Button padding */
-            background-color: #0a999e; /* Button background color */
-            color: white; /* White text */
-            border: none; /* No border */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer cursor on hover */
-            transition: background-color 0.3s; /* Smooth transition */
-        }
-
-        button:hover {
-            background-color: #45a049; /* Darker green on hover */
-        }
-
-        #image-container {
-            margin-top: 20px; /* Space above the image */
-        }
-
-        img {
-            max-width: 100%; /* Responsive image */
-            height: auto; /* Maintain aspect ratio */
-            border-radius: 8px; /* Rounded corners for the image */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-        }
-
-        .image-list {
-            margin-top: 20px; /* Space above the image list */
-            max-width: 600px; /* Limit width of the list */
-            margin: 0 auto; /* Center the list */
-            text-align: left; /* Align text to the left */
-            color: #0a999e; /* Set text color for image list */
-        }
-
-        .footer {
-            color: #0a999e; /* Footer text color */
-            margin-top: 20px; /* Space above footer */
-        }
-
-    </style>
 </head>
 <body>
         <h1>Image Viewer</h1>
