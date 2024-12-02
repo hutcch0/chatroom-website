@@ -6,6 +6,7 @@ import logging
 import os
 import traceback
 import re
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -101,7 +102,6 @@ def search_profile():
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-
             cursor.execute("SELECT username, fake_money FROM users WHERE username = %s", (username,))
             user_data = cursor.fetchone()
 
@@ -109,7 +109,6 @@ def search_profile():
             message_count_data = cursor.fetchone()
 
             if user_data:
-
                 user = {
                     'username': user_data['username'],
                     'fake_money': user_data['fake_money'],
@@ -118,7 +117,11 @@ def search_profile():
             else:
                 user = None
 
-            return render_template('profile.html', user=user)
+
+            now = datetime.now()
+
+
+            return render_template('profile.html', user=user, now=now)
     except pymysql.MySQLError as e:
         logging.error(f"Error searching profile data: {e}")
         return "An error occurred while searching for the profile.", 500
@@ -127,29 +130,37 @@ def search_profile():
 
 @app.route('/profile')
 def profile():
+
     username = session.get('username')
+
     if not username:
         return redirect(url_for('login'))
+
 
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-
             cursor.execute("SELECT username, fake_money FROM users WHERE username = %s", (username,))
             user_data = cursor.fetchone()
-
 
             cursor.execute("SELECT COUNT(*) as messages_count FROM messages WHERE username = %s", (username,))
             message_count_data = cursor.fetchone()
 
+            if user_data:
+                user = {
+                    'username': user_data['username'],
+                    'fake_money': user_data['fake_money'],
+                    'messages_count': message_count_data['messages_count']
+                }
+            else:
+                user = None
 
-            user = {
-                'username': user_data['username'],
-                'fake_money': user_data['fake_money'],
-                'messages_count': message_count_data['messages_count']
-            }
 
-            return render_template('profile.html', user=user)
+            now = datetime.now()
+
+
+            return render_template('profile.html', user=user, now=now)
+
     except pymysql.MySQLError as e:
         logging.error(f"Error fetching profile data: {e}")
         return "An error occurred while fetching profile data.", 500
