@@ -1,0 +1,145 @@
+/* Apply a light gray background to the body */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #08030d;
+    height: 100vh;
+    overflow: auto; /* Allow scrolling */
+    display: flex;
+    flex-direction: column;  /* Ensure everything is stacked vertically */
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+/* Position the link container in the top-right corner */
+#top-right-links {
+    position: fixed;
+    top: 20px;  /* Distance from the top */
+    right: 20px;  /* Distance from the right */
+    font-size: 16px;
+}
+
+/* Style for each link in the top-right corner */
+#top-right-links a {
+    display: block;
+    color: #007bff;  /* Blue color for the link */
+    text-decoration: none;
+    margin-bottom: 10px;  /* Space between links */
+    font-size: 16px;
+}
+
+#top-right-links a:hover {
+    text-decoration: underline;  /* Underline on hover */
+}
+
+/* Title and Image */
+#chatroom-title {
+    display: flex;
+    align-items: center; /* Keep the title and image on the same line */
+    margin-bottom: 20px;
+    color: #0a999e;
+}
+
+#chatroom-title img {
+    width: 40px; /* Adjust the size of the image */
+    height: 40px;
+    margin-right: 10px; /* Space between image and text */
+}
+
+/* Chat area */
+#chat {
+    width: 100%;  /* Full width of the container */
+    height: calc(100% - 140px); /* Fill the space below the title and chat form */
+    overflow-y: auto;  /* Enable scrolling for chat messages */
+    margin-top: 20px;
+    padding-bottom: 60px; /* Prevents messages from being hidden behind the chat form */
+    box-sizing: border-box;
+}
+
+#messages {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #0a999e;
+}
+
+/* Make sure each message appears on its own line */
+#messages li {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    background: #e9ecef;
+    font-size: 18px;
+    word-wrap: break-word; /* Break long words to fit within the container */
+    white-space: pre-wrap; /* Preserve spaces and line breaks */
+    overflow-wrap: break-word; /* Ensure long words break within their container */
+    max-width: 100%; /* Prevent messages from exceeding the container width */
+    display: block; /* Ensure messages are block-level and stacked vertically */
+}
+
+/* Ensure message text wraps correctly within the li */
+#messages li {
+    word-wrap: break-word;
+    white-space: normal; /* Allow message to break across lines */
+    max-width: 100%;
+}
+
+/* Fixed position for the chat form */
+#chat-form {
+    position: fixed;
+    bottom: 20px; /* Distance from the bottom of the screen */
+    left: 20px; /* Distance from the left side of the screen */
+    right: 20px; /* Ensure the form stretches across the full width */
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+#chat-form input[type="text"] {
+    flex: 1; /* Allow input to fill remaining space */
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    transition: border-color 0.3s;
+}
+
+#chat-form input[type="text"]:focus {
+    border-color: #007bff; /* Blue border when focused */
+}
+
+#chat-form button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#chat-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Optional: Media queries for responsiveness */
+@media (max-width: 768px) {
+    #chat-form {
+        flex-direction: column;
+    }
+
+    #chat-form input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #chat-form button {
+        width: 100%;
+    }
+}
