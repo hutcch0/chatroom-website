@@ -76,6 +76,26 @@ def init_db():
     finally:
         conn.close()
 
+@app.route('/bugs_fixed')
+def bugs_fixed():
+    return render_template('bugs_fixed.html')
+
+@app.route('/Planned_Updates')
+def Planned_Updates():
+    return render_template('Planned_Updates.html')
+
+@app.route('/FAQ')
+def FAQ():
+    return render_template('FAQ.html')
+
+@app.route('/v102')
+def v102():
+    return render_template('v102.html')
+
+@app.route('/v103')
+def v103():
+    return render_template('v103.html')
+
 @app.route('/privacy')
 def privacy():
     return render_template('privacy.html')
