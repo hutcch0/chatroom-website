@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Chatroom</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #2196F3;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        #chat {
+            width: 90%;
+            max-width: 600px;
+            height: 400px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        #messages {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #messages li {
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+            position: relative;
+        }
+
+        #messages li:nth-child(odd) {
+            background-color: #e7f7ff;
+        }
+
+        strong {
+            color: #4CAF50;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            position: absolute;
+            right: 10px;
+            top: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        #chat-form {
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            background-color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #chat-form input {
+            width: 80%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        #chat-form input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        #chat-form button {
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #chat-form button:hover {
+            background-color: #45a049;
+        }
+
+        /* Maintenance button */
+        #maintenance-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #maintenance-btn:hover {
+            background-color: #e68900;
+        }
+
+    </style>
+</head>
+<body>
+
+<h1>Admin Chatroom</h1>
+<a href="{{ url_for('logout') }}">Logout</a>
+
+<div id="chat">
+    <ul id="messages">
+        {% for message in messages %}
+            <li id="message-{{ message.id }}">
+                <strong>{{ message.username if message.username else "Guest" }}:</strong> {{ message.content }}
+                <button class="delete-btn" onclick="deleteMessage({{ message.id }})">Delete</button>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<form id="chat-form">
+    <input type="text" id="message-input" placeholder="Type a message..." required>
+    <button type="submit">Send</button>
+</form>
+
+<script>
+// Function to send the message using AJAX
+function sendMessage(event) {
+    event.preventDefault(); // Prevent the form from submitting the traditional way
+
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value.trim();
+
+    if (message) {
+        // Send the message using AJAX (fetch)
+        fetch('/admin/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                messageInput.value = '';
+                fetchMessages(); // Fetch new messages after sending the message
+            } else {
+                alert('Error sending message!');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+// Function to fetch new messages
+function fetchMessages() {
+    fetch('/admin/chat', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest', // Mark as an AJAX request
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messagesList = document.getElementById('messages');
+        messagesList.innerHTML = ''; // Clear current messages
+
+        data.messages.forEach(message => {
+            const li = document.createElement('li');
+            li.id = `message-${message.id}`;
+            li.innerHTML = `<strong>${message.username || 'Guest'}:</strong> ${message.content}
+                            <button class="delete-btn" onclick="deleteMessage(${message.id})">Delete</button>`;
+            messagesList.appendChild(li);
+        });
+
+        // Scroll to the bottom to show the latest message
+        messagesList.scrollTop = messagesList.scrollHeight;
+    })
+    .catch(error => console.error('Error fetching messages:', error));
+}
+
+// Function to delete a message using AJAX
+function deleteMessage(messageId) {
+    if (confirm('Are you sure you want to delete this message?')) {
+        fetch('/admin/delete_message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message_id: messageId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // If the deletion was successful, remove the message from the DOM
+                const messageElement = document.getElementById(`message-${messageId}`);
+                messageElement.remove();
+            } else {
+                alert('Error deleting message: ' + data.message);
+                console.error('Error:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error with the deletion. Please try again later.');
+        });
+    }
+}
+
+// Poll every 5 seconds to get new messages
+setInterval(fetchMessages, 5000);
+
+// Attach sendMessage to the form submit event
+const chatForm = document.getElementById('chat-form');
+chatForm.addEventListener('submit', sendMessage);
+</script>
+
+</body>
+</html>
