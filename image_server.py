@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_from_directory # Import send_from_directory
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_from_directory
 import pymysql
 
 app = Flask(__name__)
@@ -15,4 +15,3 @@ if __name__ == '__main__':
     import os
     debug_mode = os.getenv('FLASK_DEBUG', '0') == '1'
     app.run(debug=debug_mode)
-  # Use debug=False for production
