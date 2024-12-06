@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Games & Fake Money</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
-
 </head>
 <body>
 
@@ -14,17 +13,14 @@
         <div id="balance">Your Fake Money: $<span id="fake-money">{{ fake_money }}</span></div>
     </div>
 
-    <!-- Betting Section (Remains in the top) -->
     <div class="betting-container">
-        <h3>Place Your Bet (Blackjack and Guess the Number only)</h3>
+        <h3>Place Your Bet (Blackjack and Coin Flip only)</h3>
         <input type="number" id="bet-amount" min="1" placeholder="Enter bet amount" />
         <button class="game-button" id="place-bet">Place Bet</button>
         <div id="bet-error" class="game-result"></div>
     </div>
 
-    <!-- Container for the Games -->
     <div class="games-container">
-
         <!-- Spin the Wheel Game -->
         <div class="game-container">
             <h3>Spin the Wheel</h3>
@@ -54,15 +50,13 @@
             <div id="blackjack-result"></div>
         </div>
 
-		<!-- rock paper scissors -->
-		<div class="game-container">
-    		<h3>Rock, Paper, Scissors</h3>
-    		<p>Choose Rock, Paper, or Scissors to beat the computer!</p>
-    		<button class="game-button" id="rock">Rock</button>
-    		<button class="game-button" id="paper">Paper</button>
-    		<button class="game-button" id="scissors">Scissors</button>
-    		<div id="rps-result" class="game-result"></div>
-		</div>
+        <!-- New Dice Roll Game -->
+        <div class="game-container">
+            <h3>Dice Roll</h3>
+            <p>Roll the dice and win or lose some fake money based on the roll!</p>
+            <button class="game-button" id="roll-dice">Roll Dice</button>
+            <div id="dice-result" class="game-result"></div>
+        </div>
 
 		<!-- Higher or Lower Game -->
 		<div class="game-container">
@@ -74,16 +68,15 @@
     		<div id="hl-result" class="game-result"></div>
 		</div>
 
-		<!-- Memory Card Game -->
-		<div class="game-container">
-    		<h3>Memory Card Game</h3>
-    		<p>Flip the cards to find matching pairs!</p>
-    		<div id="memory-board" class="game-result"></div>
-    		<div id="memory-result" class="game-result"></div>
-		</div>
+        <!-- New Coin Flip Game -->
+        <div class="game-container">
+            <h3>Coin Flip</h3>
+            <p>Flip a coin and guess whether it will land on heads or tails!</p>
+            <button class="game-button" id="flip-coin">Flip Coin</button>
+            <input type="text" id="coin-guess" placeholder="Enter heads or tails" />
+            <div id="coin-result" class="game-result"></div>
     </div>
 
-    <!-- Leaderboard Link -->
     <div class="leaderboard-container">
         <h3>Leaderboard</h3>
         <p><a href="{{ url_for('leaderboard') }}">View Leaderboard</a></p>
@@ -146,6 +139,23 @@
             document.getElementById('place-bet').disabled = true; // Disable bet button
         });
 
+        // Dice Roll Game Logic
+        document.getElementById('roll-dice').addEventListener('click', () => {
+            const roll = Math.floor(Math.random() * 6) + 1;
+            let resultMessage = '';
+            if (roll > 3) {
+                const winAmount = 20;
+                fakeMoney += winAmount;
+                resultMessage = `You rolled a ${roll} and won $${winAmount}!`;
+            } else {
+                fakeMoney -= 10;
+                resultMessage = `You rolled a ${roll} and lost $10.`;
+            }
+            document.getElementById('dice-result').textContent = resultMessage;
+            updateFakeMoney();
+            saveFakeMoney();
+        });
+
         // Spin the Wheel Game with Cooldown
         document.getElementById('spin-wheel').addEventListener('click', () => {
             if (spinCooldown) {
@@ -190,7 +200,7 @@
             saveFakeMoney(); // Save updated fake money
         });
 
-        // Blackjack Game Logic
+                // Blackjack Game Logic
         document.getElementById('start-blackjack').addEventListener('click', () => {
             if (currentBet === 0) {
                 alert("Please place a bet first!");
@@ -306,129 +316,74 @@
             document.getElementById('bet-amount').value = '';
         }
 
-		// Rock, Paper, Scissors Game Logic
-		document.getElementById('rock').addEventListener('click', () => playRPS('rock'));
-		document.getElementById('paper').addEventListener('click', () => playRPS('paper'));
-		document.getElementById('scissors').addEventListener('click', () => playRPS('scissors'));
 
-		function playRPS(playerChoice) {
-    		const choices = ['rock', 'paper', 'scissors'];
-    		const computerChoice = choices[Math.floor(Math.random() * 3)];
+let currentNumber = 50; // Initial number
 
-    		let resultMessage = '';
-    		if (playerChoice === computerChoice) {
-        		resultMessage = `It's a tie! Both chose ${playerChoice}.`;
-    		} else if (
-        		(playerChoice === 'rock' && computerChoice === 'scissors') ||
-        		(playerChoice === 'paper' && computerChoice === 'rock') ||
-        		(playerChoice === 'scissors' && computerChoice === 'paper')
-    		) {
-        		resultMessage = `You win! ${playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1)} beats ${computerChoice}.`;
-        		fakeMoney += 20;  // Win 20 fake money
-    		} else {
-        		resultMessage = `You lose! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1)} beats ${playerChoice}.`;
-        		fakeMoney -= 10;  // Lose 10 fake money
-    		}
+// Update the displayed number
+function updateHLNumber() {
+    document.getElementById('current-number').textContent = `Current number: ${currentNumber}`;
+}
 
-    		document.getElementById('rps-result').textContent = resultMessage;
-    		updateFakeMoney();
-    		saveFakeMoney();
-		}
+// Add event listeners for Higher and Lower buttons
+document.getElementById('higher').addEventListener('click', () => guessHL('higher'));
+document.getElementById('lower').addEventListener('click', () => guessHL('lower'));
 
-		// Higher or Lower Game Logic
-		let currentNumber = 50; // Initial number
+function guessHL(guess) {
+    const nextNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
+    let resultMessage = '';
 
-		document.getElementById('higher').addEventListener('click', () => guessHL('higher'));
-		document.getElementById('lower').addEventListener('click', () => guessHL('lower'));
+    if ((guess === 'higher' && nextNumber > currentNumber) || (guess === 'lower' && nextNumber < currentNumber)) {
+        resultMessage = `Correct! The next number was ${nextNumber}. You win $20!`;
+        fakeMoney += 20; // Win 20 fake money
+    } else {
+        resultMessage = `Incorrect! The next number was ${nextNumber}. You lose $10.`;
+        fakeMoney -= 10; // Lose 10 fake money
+    }
 
-		function guessHL(guess) {
-    		const nextNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
-    		let resultMessage = '';
+    currentNumber = nextNumber; // Update the current number
+    updateHLNumber();
+    document.getElementById('hl-result').textContent = resultMessage;
+    updateFakeMoney();
+    saveFakeMoney();
+}
 
-    		if ((guess === 'higher' && nextNumber > currentNumber) || (guess === 'lower' && nextNumber < currentNumber)) {
-        		resultMessage = `Correct! The next number was ${nextNumber}. You win $20!`;
-        		fakeMoney += 20; // Win 20 fake money
-    		} else {
-        		resultMessage = `Incorrect! The next number was ${nextNumber}. You lose $10.`;
-        		fakeMoney -= 10; // Lose 10 fake money
-    		}
+// Initialize the current number display
+updateHLNumber();
 
-    		currentNumber = nextNumber; // Update the current number
-    		document.getElementById('current-number').textContent = `Current number: ${currentNumber}`;
-    		document.getElementById('hl-result').textContent = resultMessage;
-    		updateFakeMoney();
-    		saveFakeMoney();
-		}
 
-		// Memory Card Game Logic
-        const cards = [
-            { id: 1, value: 'A' },
-            { id: 2, value: 'A' },
-            { id: 3, value: 'B' },
-            { id: 4, value: 'B' },
-            { id: 5, value: 'C' },
-            { id: 6, value: 'C' },
-            { id: 7, value: 'D' },
-            { id: 8, value: 'D' }
-        ];
+// Coin Flip Game Logic
+document.getElementById('flip-coin').addEventListener('click', () => {
+    const guess = document.getElementById('coin-guess').value.trim().toLowerCase();
 
-        let flippedCards = [];
-        let matchedPairs = 0;
+    // Validate input
+    if (!['heads', 'tails'].includes(guess)) {
+        document.getElementById('coin-result').textContent = "Please guess either 'heads' or 'tails'.";
+        return;
+    }
 
-        function shuffleCards(cards) {
-            return cards.sort(() => Math.random() - 0.5);
-        }
+    // Ensure a bet has been placed
+    if (currentBet <= 0) {
+        document.getElementById('coin-result').textContent = "Please place a valid bet first!";
+        return;
+    }
 
-        function flipCard(cardId) {
-            if (flippedCards.length === 2) return; // Only allow flipping two cards at a time
-            const card = document.getElementById(cardId);
-            card.textContent = card.dataset.value; // Show the value of the card
-            flippedCards.push(cardId);
+    // Simulate coin flip
+    const flipResult = Math.random() < 0.5 ? 'heads' : 'tails';
+    if (guess === flipResult) {
+        const winAmount = currentBet * 2; // Double the bet as reward
+        fakeMoney += winAmount;
+        document.getElementById('coin-result').textContent = `You guessed ${flipResult} and won $${winAmount}!`;
+    } else {
+        fakeMoney -= currentBet; // Deduct the bet amount on loss
+        document.getElementById('coin-result').textContent = `You guessed ${guess}, but it was ${flipResult}. You lost $${currentBet}.`;
+    }
 
-            if (flippedCards.length === 2) {
-                setTimeout(checkMatch, 1000);
-            }
-        }
+    // Update fake money
+    updateFakeMoney();
+    saveFakeMoney();
+});
 
-        function checkMatch() {
-            const [firstCardId, secondCardId] = flippedCards;
-            const firstCard = document.getElementById(firstCardId);
-            const secondCard = document.getElementById(secondCardId);
-
-            if (firstCard.dataset.value === secondCard.dataset.value) {
-                matchedPairs++;
-                fakeMoney += 10; // Win 10 fake money for each matched pair
-                document.getElementById('memory-result').textContent = `You found a match! ${matchedPairs} pair(s) matched.`;
-                if (matchedPairs === cards.length / 2) {
-                    document.getElementById('memory-result').textContent = `You win! All pairs matched.`;
-                }
-            } else {
-                fakeMoney -= 5; // Lose 5 fake money for each failed match
-                firstCard.textContent = '';
-                secondCard.textContent = '';
-            }
-
-            updateFakeMoney();
-            saveFakeMoney();
-            flippedCards = [];
-        }
-
-        function generateBoard() {
-            const shuffledCards = shuffleCards(cards);
-            const board = document.getElementById('memory-board');
-            board.innerHTML = '';
-
-            shuffledCards.forEach(card => {
-                const cardElement = document.createElement('div');
-                cardElement.classList.add('memory-card');
-                cardElement.dataset.value = card.value;
-                cardElement.id = `card-${card.id}`;
-                cardElement.addEventListener('click', () => flipCard(cardElement.id));
-                board.appendChild(cardElement);
-            });
-        }
-
-        generateBoard();
+        updateFakeMoney();
     </script>
 
 </body>
