@@ -78,27 +78,27 @@ def init_db():
 
 @app.route('/bugs_fixed')
 def bugs_fixed():
-    return render_template('bugs_fixed.html')
+    return render_template('blog/bugs_fixed.html')
 
 @app.route('/Planned_Updates')
 def Planned_Updates():
-    return render_template('Planned_Updates.html')
+    return render_template('blog/Planned_Updates.html')
 
 @app.route('/FAQ')
 def FAQ():
-    return render_template('FAQ.html')
+    return render_template('blog/FAQ.html')
 
 @app.route('/v102')
 def v102():
-    return render_template('v102.html')
+    return render_template('blog/v102.html')
 
 @app.route('/v103')
 def v103():
-    return render_template('v103.html')
+    return render_template('blog/v103.html')
 
 @app.route('/privacy')
 def privacy():
-    return render_template('privacy.html')
+    return render_template('blog/privacy.html')
 
 @app.route('/suggestions')
 def suggestions():
@@ -287,7 +287,7 @@ def update_fake_money_in_db(username, fake_money):
 
 @app.route('/blog')
 def blog():
-    return render_template('blog.html')
+    return render_template('blog/blog.html')
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -460,7 +460,7 @@ def verify_admin_credentials(username, password):
 
 @app.route('/admin_chat')
 def admin_chat_page():
-    return render_template('admin_chat.html')
+    return render_template('admin/admin_chat.html')
 
 @app.route('/rules')
 def rules():
@@ -479,7 +479,7 @@ def admin_login():
 
         return "Invalid credentials", 401
 
-    return render_template('admin.html')
+    return render_template('admin/admin.html')
 
 @app.route('/chatroom')
 def chatroom_page():
@@ -524,7 +524,7 @@ def admin_chat():
 
 
     messages = load_messages()
-    return render_template('admin_chat.html', messages=messages)
+    return render_template('admin/admin_chat.html', messages=messages)
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
