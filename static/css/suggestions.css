@@ -1,6 +1,6 @@
 body {
-    background-color: #08030d; /* Set background color */
-    color: #0a999e; /* Set text color */
+    background-color: #08030d; 
+    color: #0a999e; 
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@ body {
 }
 .container {
     text-align: center;
-    background-color: #1e121b; /* A darker background for the form */
+    background-color: #1e121b; 
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
