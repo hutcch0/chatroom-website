@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>blog</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+</head>
+<body>
+
+<div class="header">
+  <h2>Welcome to My Blog</h2>
+</div>
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="card">
+      <h2>video (beta feature)</h2>
+      <h5>Posted on: December 8, 2024</h5>
+        <video width="600" controls>
+            <source src="{{ url_for('static', filename='video/lookaround.webm') }}" type="video/webm">
+            Your browser does not support HTML video.
+        </video>
+
+  <div class="rightcolumn">
+    <div class="card">
+      <h2>links</h2>
+        <a href="{{ url_for('index_page') }}">Chatroom</a></p>
+        <a href="{{ url_for('games') }}">games</a></p>
+    </div>
+    <div class="card">
+      <h3>Where to find us</h3>
+ 		<p>we have this chatroom, x(twitter) and my other website
+           <ul>
+               <li><a href="https://hutcch.eu.pythonanywhere.com/">the chatroom</a></li>
+               <li><a href="https://x.com/chatroombyHVN">x(twitter)</a></li>
+               <li><a href="https://hutcch.neocities.org/">my other website</a></li>
+           </ul>
+    </div>
+    <div class="card">
+      <h3>Contact</h3>
+      <p>If you have any questions or feedback, feel free to contact us at <a href="8hqz5hgfb@mozmail.com">8hqz5hgfb@mozmail.com</a> also the files are on github <a href="https://github.com/hutcch0/chatroom-website/tree/main">website</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <h2><p>&copy; 2024 Chatroom Project by hutcch's Virtual Network | <a href="{{ url_for('index_page') }}">Go to Chatroom</a></p></h2>
+</div>
+
+</body>
+</html>
