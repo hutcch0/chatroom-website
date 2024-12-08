@@ -1,4 +1,3 @@
-/* Style updates */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #08030d;
@@ -16,11 +15,10 @@ body {
     font-size: 1.2em;
     margin-top: 10px;
 }
-/* Container for the games section */
 .games-container {
-    display: grid; /* Use grid layout */
-    grid-template-columns: repeat(3, 1fr); /* 3 equal-width columns */
-    gap: 20px; /* Space between the games */
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px;
     padding: 20px;
 }
 .game-container {
@@ -28,7 +26,7 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Full width inside grid cell */
+    width: 100%;
 }
 .game-container h3 {
     color: #0a999e;
@@ -60,6 +58,7 @@ input[type="number"], input[type="text"] {
 .leaderboard-container {
     text-align: center;
 }
+}
 .leaderboard-container a {
     font-size: 1.2em;
     color: #0a999e;
@@ -68,7 +67,6 @@ input[type="number"], input[type="text"] {
 .leaderboard-container a:hover {
     text-decoration: underline;
 }
-/* Blackjack Game Styles */
 #blackjack-game {
     background-color: #08030d;
     color: #0a999e;
@@ -80,7 +78,6 @@ input[type="number"], input[type="text"] {
     font-size: 1.5em;
     margin-top: 20px;
 }
-/* Betting Container Styling */
 .betting-container {
     background-color: #08030d;
     padding: 20px;
@@ -89,27 +86,41 @@ input[type="number"], input[type="text"] {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
-/* Memory Card Game Styling */
-.memory-card {
-    width: 80px;
-    height: 80px;
-    margin: 5px;
-    background-color: #08030d;
-    color: #0a999e;
-    font-size: 2em;
-    text-align: center;
-    line-height: 80px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: inline-block;
+.sell {
+    background-color: #f44336; 
 }
-.memory-card:hover {
-    background-color: #08030d;
-    color: #0a999;
+.stock-result {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #555;
 }
-#memory-board {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    color: #0a999;
+.slot-machine-display {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.slot-reel {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #333;
+    margin: 0 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+}
+.poker-hand {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+    .poker-card {
+    width: 50px;
+    height: 75px;
+    border: 1px solid #333;
+    margin: 0 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
 }
