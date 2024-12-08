@@ -21,16 +21,14 @@
     </div>
 
     <div class="games-container">
-        
         <div class="game-container">
             <h3>Spin the Wheel</h3>
             <p>Try your luck! Spin the wheel to win or lose some fake money!</p>
             <button class="game-button" id="spin-wheel">Spin</button>
             <div id="wheel-result" class="game-result"></div>
-            <div id="spin-cooldown" class="game-result"></div> 
+            <div id="spin-cooldown" class="game-result"></div>
         </div>
 
-        
         <div class="game-container">
             <h3>Guess the Number</h3>
             <p>Guess the correct number between 1 and 10 to win fake money!</p>
@@ -39,8 +37,7 @@
             <div id="guess-result" class="game-result"></div>
         </div>
 
-        
-        <div class="game-container" id="blackjack-game">
+        <div class="game-container">
             <h3>Blackjack</h3>
             <p>Try your luck against the dealer! The goal is to get as close to 21 as possible without going over.</p>
             <button class="game-button" id="start-blackjack">Start Game</button>
@@ -50,7 +47,18 @@
             <div id="blackjack-result"></div>
         </div>
 
-        
+        <div class="game-container">
+            <h3>Slots Machine</h3>
+            <p>Spin the reels and try to match symbols to win big!</p>
+            <div class="slot-machine-display">
+                <div class="slot-reel" id="slot-reel-1">?</div>
+                <div class="slot-reel" id="slot-reel-2">?</div>
+                <div class="slot-reel" id="slot-reel-3">?</div>
+            </div>
+            <button class="game-button" id="spin-slots">Spin Slots</button>
+            <div id="slots-result" class="game-result"></div>
+        </div>
+
         <div class="game-container">
             <h3>Dice Roll</h3>
             <p>Roll the dice and win or lose some fake money based on the roll!</p>
@@ -58,15 +66,28 @@
             <div id="dice-result" class="game-result"></div>
         </div>
 
-		
-		<div class="game-container">
-    		<h3>Higher or Lower</h3>
-    		<p>Guess if the next number will be higher or lower!</p>
-    		<div id="current-number" class="game-result">Current number: 50</div>
-    		<button class="game-button" id="higher">Higher</button>
-    		<button class="game-button" id="lower">Lower</button>
-    		<div id="hl-result" class="game-result"></div>
-		</div>
+        <div class="game-container">
+            <h3>Higher or Lower</h3>
+            <p>Guess if the next number will be higher or lower!</p>
+            <div id="current-number" class="game-result">Current number: 50</div>
+            <button class="game-button" id="higher">Higher</button>
+            <button class="game-button" id="lower">Lower</button>
+            <div id="hl-result" class="game-result"></div>
+        </div>
+
+        <div class="game-container">
+            <h3>Poker (5 Card Draw)</h3>
+            <p>Draw 5 cards and see if you can make a winning hand!</p>
+            <div class="poker-hand">
+                <div class="poker-card" id="poker-card-1">?</div>
+                <div class="poker-card" id="poker-card-2">?</div>
+                <div class="poker-card" id="poker-card-3">?</div>
+                <div class="poker-card" id="poker-card-4">?</div>
+                <div class="poker-card" id="poker-card-5">?</div>
+            </div>
+            <button class="game-button" id="draw-poker">Draw Cards</button>
+            <div id="poker-result" class="game-result"></div>
+        </div>
 
         <div class="game-container">
             <h3>Coin Flip</h3>
@@ -74,6 +95,12 @@
             <button class="game-button" id="flip-coin">Flip Coin</button>
             <input type="text" id="coin-guess" placeholder="Enter heads or tails" />
             <div id="coin-result" class="game-result"></div>
+        </div>
+
+        <div class="game-container">
+            <h3>Coming Soon</h3>
+            <p>Stay tuned for a new game!</p>
+        </div>
     </div>
 
     <div class="leaderboard-container">
@@ -85,11 +112,11 @@
     </div>
 
     <script>
-        
-        let fakeMoney = {{ fake_money }}; 
-        let currentBet = 0; // 
-        let spinCooldown = false; 
-        const cooldownTime = 5000; 
+
+        let fakeMoney = {{ fake_money }};
+        let currentBet = 0; //
+        let spinCooldown = false;
+        const cooldownTime = 5000;
         let deck, playerHand, dealerHand;
 
         function updateFakeMoney() {
@@ -128,10 +155,10 @@
                 return;
             }
 
-            currentBet = betAmount; 
-            document.getElementById('bet-error').textContent = ""; 
-            document.getElementById('bet-amount').disabled = true; 
-            document.getElementById('place-bet').disabled = true; 
+            currentBet = betAmount;
+            document.getElementById('bet-error').textContent = "";
+            document.getElementById('bet-amount').disabled = true;
+            document.getElementById('place-bet').disabled = true;
         });
 
         document.getElementById('roll-dice').addEventListener('click', () => {
@@ -159,12 +186,12 @@
             spinCooldown = true;
             document.getElementById('spin-cooldown').textContent = "Cooldown active... Please wait a moment.";
 
-            const result = Math.floor(Math.random() * 151) - 50; 
+            const result = Math.floor(Math.random() * 151) - 50;
             fakeMoney += result;
             let resultText = `You ${result >= 0 ? 'won' : 'lost'} $${Math.abs(result)}!`;
             document.getElementById('wheel-result').textContent = resultText;
             updateFakeMoney();
-            saveFakeMoney(); 
+            saveFakeMoney();
 
             setTimeout(() => {
                 spinCooldown = false;
@@ -174,7 +201,7 @@
 
         document.getElementById('submit-guess').addEventListener('click', () => {
             const userGuess = parseInt(document.getElementById('guess-number').value);
-            const correctNumber = Math.floor(Math.random() * 10) + 1; 
+            const correctNumber = Math.floor(Math.random() * 10) + 1;
 
             let resultMessage = '';
             if (userGuess === correctNumber) {
@@ -187,7 +214,7 @@
 
             document.getElementById('guess-result').textContent = resultMessage;
             updateFakeMoney();
-            saveFakeMoney(); 
+            saveFakeMoney();
         });
 
         document.getElementById('start-blackjack').addEventListener('click', () => {
@@ -231,13 +258,13 @@
                 const winAmount = currentBet * 2;
                 fakeMoney += winAmount;
                 document.getElementById('blackjack-result').textContent = `You win! Your total value is ${playerValue}, dealer's value is ${dealerValue}. You win $${winAmount}.`;
-                saveFakeMoney(); 
+                saveFakeMoney();
             } else if (playerValue === dealerValue) {
                 document.getElementById('blackjack-result').textContent = `It's a tie! Both have ${playerValue}.`;
             } else {
                 fakeMoney -= currentBet;
                 document.getElementById('blackjack-result').textContent = `You lose! Your total value is ${playerValue}, dealer's value is ${dealerValue}. You lost $${currentBet}.`;
-                saveFakeMoney(); 
+                saveFakeMoney();
             }
 
             endBlackjack();
@@ -304,7 +331,7 @@
             document.getElementById('bet-amount').value = '';
         }
 
-let currentNumber = 50; 
+let currentNumber = 50;
 
 function updateHLNumber() {
     document.getElementById('current-number').textContent = `Current number: ${currentNumber}`;
@@ -314,18 +341,18 @@ document.getElementById('higher').addEventListener('click', () => guessHL('highe
 document.getElementById('lower').addEventListener('click', () => guessHL('lower'));
 
 function guessHL(guess) {
-    const nextNumber = Math.floor(Math.random() * 100) + 1; 
+    const nextNumber = Math.floor(Math.random() * 100) + 1;
     let resultMessage = '';
 
     if ((guess === 'higher' && nextNumber > currentNumber) || (guess === 'lower' && nextNumber < currentNumber)) {
         resultMessage = `Correct! The next number was ${nextNumber}. You win $20!`;
-        fakeMoney += 20; 
+        fakeMoney += 20;
     } else {
         resultMessage = `Incorrect! The next number was ${nextNumber}. You lose $10.`;
-        fakeMoney -= 10; 
+        fakeMoney -= 10;
     }
 
-    currentNumber = nextNumber; 
+    currentNumber = nextNumber;
     updateHLNumber();
     document.getElementById('hl-result').textContent = resultMessage;
     updateFakeMoney();
@@ -349,11 +376,11 @@ document.getElementById('flip-coin').addEventListener('click', () => {
 
     const flipResult = Math.random() < 0.5 ? 'heads' : 'tails';
     if (guess === flipResult) {
-        const winAmount = currentBet * 2; 
+        const winAmount = currentBet * 2;
         fakeMoney += winAmount;
         document.getElementById('coin-result').textContent = `You guessed ${flipResult} and won $${winAmount}!`;
     } else {
-        fakeMoney -= currentBet; 
+        fakeMoney -= currentBet;
         document.getElementById('coin-result').textContent = `You guessed ${guess}, but it was ${flipResult}. You lost $${currentBet}.`;
     }
 
@@ -361,8 +388,107 @@ document.getElementById('flip-coin').addEventListener('click', () => {
     saveFakeMoney();
 });
 
-        updateFakeMoney();
-    </script>
+        document.getElementById('spin-slots').addEventListener('click', () => {
+            const symbols = ['🍒', '🍋', '🍇', '🍊', '7️⃣', '💎'];
+            const reels = [
+                document.getElementById('slot-reel-1'),
+                document.getElementById('slot-reel-2'),
+                document.getElementById('slot-reel-3')
+            ];
 
+            const spinResults = reels.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+
+            spinResults.forEach((symbol, index) => {
+                reels[index].textContent = symbol;
+            });
+
+            let resultMessage = '';
+            let winAmount = 0;
+
+            if (spinResults[0] === spinResults[1] && spinResults[1] === spinResults[2]) {
+                winAmount = 100;
+                resultMessage = `JACKPOT! All matching symbols. You win $${winAmount}!`;
+            }
+
+            else if (spinResults[0] === spinResults[1] || spinResults[1] === spinResults[2]) {
+                winAmount = 50;
+                resultMessage = `Two matching symbols! You win $${winAmount}!`;
+            }
+
+            else {
+                winAmount = -20;
+                resultMessage = `No match. You lose $20.`;
+            }
+
+            fakeMoney += winAmount;
+            document.getElementById('slots-result').textContent = resultMessage;
+            updateFakeMoney();
+            saveFakeMoney();
+        });
+
+        document.getElementById('draw-poker').addEventListener('click', () => {
+            const suits = ['♠', '♣', '♥', '♦'];
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            const pokerCards = [
+                document.getElementById('poker-card-1'),
+                document.getElementById('poker-card-2'),
+                document.getElementById('poker-card-3'),
+                document.getElementById('poker-card-4'),
+                document.getElementById('poker-card-5')
+            ];
+
+            const drawnCards = [];
+            while (drawnCards.length < 5) {
+                const card = {
+                    value: values[Math.floor(Math.random() * values.length)],
+                    suit: suits[Math.floor(Math.random() * suits.length)]
+                };
+                if (!drawnCards.some(c => c.value === card.value && c.suit === card.suit)) {
+                    drawnCards.push(card);
+                }
+            }
+
+            drawnCards.forEach((card, index) => {
+                pokerCards[index].textContent = `${card.value}${card.suit}`;
+            });
+
+            let resultMessage = '';
+            let winAmount = 0;
+
+            const valueCount = drawnCards.reduce((acc, card) => {
+                acc[card.value] = (acc[card.value] || 0) + 1;
+                return acc;
+            }, {});
+
+            const counts = Object.values(valueCount);
+
+            if (counts.includes(4)) {
+                winAmount = 250;
+                resultMessage = `Four of a Kind! You win $${winAmount}!`;
+            } else if (counts.includes(3) && counts.includes(2)) {
+                winAmount = 150;
+                resultMessage = `Full House! You win $${winAmount}!`;
+            } else if (counts.includes(3)) {
+                winAmount = 100;
+                resultMessage = `Three of a Kind! You win $${winAmount}!`;
+            } else if (counts.filter(count => count === 2).length === 2) {
+                winAmount = 50;
+                resultMessage = `Two Pair! You win $${winAmount}!`;
+            } else if (counts.includes(2)) {
+                winAmount = 20;
+                resultMessage = `One Pair! You win $${winAmount}!`;
+            } else {
+                winAmount = -30;
+                resultMessage = `No winning hand. You lose $30.`;
+            }
+
+            fakeMoney += winAmount;
+            document.getElementById('poker-result').textContent = resultMessage;
+            updateFakeMoney();
+            saveFakeMoney();
+        });
+
+                updateFakeMoney();
+    </script>
 </body>
 </html>
