@@ -85,17 +85,15 @@
     <script>
         function showImage() {
             const filename = document.getElementById('filename-input').value;
-            const imageUrl = `/images/${filename}`; // This will point to your Flask route
+            const imageUrl = `/images/${filename}`;
             const imageContainer = document.getElementById('image-container');
 
             const img = document.createElement('img');
             img.src = imageUrl;
             img.alt = filename;
 
-            // Clear previous images
             imageContainer.innerHTML = '';
 
-            // Add error handling for image loading
             img.onerror = function() {
                 imageContainer.innerHTML = `<p style="color: red;">Image not found: ${filename}</p>`;
             };
