@@ -21,16 +21,16 @@
     </div>
 
     <div class="games-container">
-        <!-- Spin the Wheel Game -->
+        
         <div class="game-container">
             <h3>Spin the Wheel</h3>
             <p>Try your luck! Spin the wheel to win or lose some fake money!</p>
             <button class="game-button" id="spin-wheel">Spin</button>
             <div id="wheel-result" class="game-result"></div>
-            <div id="spin-cooldown" class="game-result"></div> <!-- Cooldown message -->
+            <div id="spin-cooldown" class="game-result"></div> 
         </div>
 
-        <!-- Guess the Number Game -->
+        
         <div class="game-container">
             <h3>Guess the Number</h3>
             <p>Guess the correct number between 1 and 10 to win fake money!</p>
@@ -39,7 +39,7 @@
             <div id="guess-result" class="game-result"></div>
         </div>
 
-        <!-- Blackjack Game -->
+        
         <div class="game-container" id="blackjack-game">
             <h3>Blackjack</h3>
             <p>Try your luck against the dealer! The goal is to get as close to 21 as possible without going over.</p>
@@ -50,7 +50,7 @@
             <div id="blackjack-result"></div>
         </div>
 
-        <!-- New Dice Roll Game -->
+        
         <div class="game-container">
             <h3>Dice Roll</h3>
             <p>Roll the dice and win or lose some fake money based on the roll!</p>
@@ -58,7 +58,7 @@
             <div id="dice-result" class="game-result"></div>
         </div>
 
-		<!-- Higher or Lower Game -->
+		
 		<div class="game-container">
     		<h3>Higher or Lower</h3>
     		<p>Guess if the next number will be higher or lower!</p>
@@ -68,7 +68,6 @@
     		<div id="hl-result" class="game-result"></div>
 		</div>
 
-        <!-- New Coin Flip Game -->
         <div class="game-container">
             <h3>Coin Flip</h3>
             <p>Flip a coin and guess whether it will land on heads or tails!</p>
@@ -86,19 +85,17 @@
     </div>
 
     <script>
-        // Fake Money system (client-side)
-        let fakeMoney = {{ fake_money }}; // Initial fake money balance from the server
-        let currentBet = 0; // Track the current bet amount
-        let spinCooldown = false; // Cooldown state for spin the wheel
-        const cooldownTime = 5000; // Cooldown time in milliseconds (5 seconds)
+        
+        let fakeMoney = {{ fake_money }}; 
+        let currentBet = 0; // 
+        let spinCooldown = false; 
+        const cooldownTime = 5000; 
         let deck, playerHand, dealerHand;
 
-        // Update the fake money balance on the page
         function updateFakeMoney() {
             document.getElementById('fake-money').textContent = fakeMoney;
         }
 
-        // Send updated fake money to the server
         function saveFakeMoney() {
             fetch('/update_fake_money', {
                 method: 'POST',
@@ -118,11 +115,9 @@
               });
         }
 
-        // Place a bet for Blackjack only
         document.getElementById('place-bet').addEventListener('click', () => {
             const betAmount = parseInt(document.getElementById('bet-amount').value);
 
-            // Check if the bet is valid
             if (isNaN(betAmount) || betAmount <= 0) {
                 document.getElementById('bet-error').textContent = "Please enter a valid bet amount.";
                 return;
@@ -133,13 +128,12 @@
                 return;
             }
 
-            currentBet = betAmount; // Set the current bet
-            document.getElementById('bet-error').textContent = ""; // Clear any errors
-            document.getElementById('bet-amount').disabled = true; // Disable bet input
-            document.getElementById('place-bet').disabled = true; // Disable bet button
+            currentBet = betAmount; 
+            document.getElementById('bet-error').textContent = ""; 
+            document.getElementById('bet-amount').disabled = true; 
+            document.getElementById('place-bet').disabled = true; 
         });
 
-        // Dice Roll Game Logic
         document.getElementById('roll-dice').addEventListener('click', () => {
             const roll = Math.floor(Math.random() * 6) + 1;
             let resultMessage = '';
@@ -156,35 +150,31 @@
             saveFakeMoney();
         });
 
-        // Spin the Wheel Game with Cooldown
         document.getElementById('spin-wheel').addEventListener('click', () => {
             if (spinCooldown) {
                 document.getElementById('spin-cooldown').textContent = "Please wait for the cooldown!";
                 return;
             }
 
-            // Start the cooldown
             spinCooldown = true;
             document.getElementById('spin-cooldown').textContent = "Cooldown active... Please wait a moment.";
 
-            const result = Math.floor(Math.random() * 151) - 50; // Random win/loss amount
+            const result = Math.floor(Math.random() * 151) - 50; 
             fakeMoney += result;
             let resultText = `You ${result >= 0 ? 'won' : 'lost'} $${Math.abs(result)}!`;
             document.getElementById('wheel-result').textContent = resultText;
             updateFakeMoney();
-            saveFakeMoney(); // Save updated fake money
+            saveFakeMoney(); 
 
-            // End cooldown after the specified time
             setTimeout(() => {
                 spinCooldown = false;
                 document.getElementById('spin-cooldown').textContent = "";
             }, cooldownTime);
         });
 
-        // Guess the Number Game
         document.getElementById('submit-guess').addEventListener('click', () => {
             const userGuess = parseInt(document.getElementById('guess-number').value);
-            const correctNumber = Math.floor(Math.random() * 10) + 1; // Random number between 1 and 10
+            const correctNumber = Math.floor(Math.random() * 10) + 1; 
 
             let resultMessage = '';
             if (userGuess === correctNumber) {
@@ -197,10 +187,9 @@
 
             document.getElementById('guess-result').textContent = resultMessage;
             updateFakeMoney();
-            saveFakeMoney(); // Save updated fake money
+            saveFakeMoney(); 
         });
 
-                // Blackjack Game Logic
         document.getElementById('start-blackjack').addEventListener('click', () => {
             if (currentBet === 0) {
                 alert("Please place a bet first!");
@@ -242,19 +231,18 @@
                 const winAmount = currentBet * 2;
                 fakeMoney += winAmount;
                 document.getElementById('blackjack-result').textContent = `You win! Your total value is ${playerValue}, dealer's value is ${dealerValue}. You win $${winAmount}.`;
-                saveFakeMoney(); // Save updated fake money
+                saveFakeMoney(); 
             } else if (playerValue === dealerValue) {
                 document.getElementById('blackjack-result').textContent = `It's a tie! Both have ${playerValue}.`;
             } else {
                 fakeMoney -= currentBet;
                 document.getElementById('blackjack-result').textContent = `You lose! Your total value is ${playerValue}, dealer's value is ${dealerValue}. You lost $${currentBet}.`;
-                saveFakeMoney(); // Save updated fake money
+                saveFakeMoney(); 
             }
 
             endBlackjack();
         });
 
-        // Helper functions for Blackjack game
         function createDeck() {
             const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
             const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
@@ -316,69 +304,59 @@
             document.getElementById('bet-amount').value = '';
         }
 
+let currentNumber = 50; 
 
-let currentNumber = 50; // Initial number
-
-// Update the displayed number
 function updateHLNumber() {
     document.getElementById('current-number').textContent = `Current number: ${currentNumber}`;
 }
 
-// Add event listeners for Higher and Lower buttons
 document.getElementById('higher').addEventListener('click', () => guessHL('higher'));
 document.getElementById('lower').addEventListener('click', () => guessHL('lower'));
 
 function guessHL(guess) {
-    const nextNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
+    const nextNumber = Math.floor(Math.random() * 100) + 1; 
     let resultMessage = '';
 
     if ((guess === 'higher' && nextNumber > currentNumber) || (guess === 'lower' && nextNumber < currentNumber)) {
         resultMessage = `Correct! The next number was ${nextNumber}. You win $20!`;
-        fakeMoney += 20; // Win 20 fake money
+        fakeMoney += 20; 
     } else {
         resultMessage = `Incorrect! The next number was ${nextNumber}. You lose $10.`;
-        fakeMoney -= 10; // Lose 10 fake money
+        fakeMoney -= 10; 
     }
 
-    currentNumber = nextNumber; // Update the current number
+    currentNumber = nextNumber; 
     updateHLNumber();
     document.getElementById('hl-result').textContent = resultMessage;
     updateFakeMoney();
     saveFakeMoney();
 }
 
-// Initialize the current number display
 updateHLNumber();
 
-
-// Coin Flip Game Logic
 document.getElementById('flip-coin').addEventListener('click', () => {
     const guess = document.getElementById('coin-guess').value.trim().toLowerCase();
 
-    // Validate input
     if (!['heads', 'tails'].includes(guess)) {
         document.getElementById('coin-result').textContent = "Please guess either 'heads' or 'tails'.";
         return;
     }
 
-    // Ensure a bet has been placed
     if (currentBet <= 0) {
         document.getElementById('coin-result').textContent = "Please place a valid bet first!";
         return;
     }
 
-    // Simulate coin flip
     const flipResult = Math.random() < 0.5 ? 'heads' : 'tails';
     if (guess === flipResult) {
-        const winAmount = currentBet * 2; // Double the bet as reward
+        const winAmount = currentBet * 2; 
         fakeMoney += winAmount;
         document.getElementById('coin-result').textContent = `You guessed ${flipResult} and won $${winAmount}!`;
     } else {
-        fakeMoney -= currentBet; // Deduct the bet amount on loss
+        fakeMoney -= currentBet; 
         document.getElementById('coin-result').textContent = `You guessed ${guess}, but it was ${flipResult}. You lost $${currentBet}.`;
     }
 
-    // Update fake money
     updateFakeMoney();
     saveFakeMoney();
 });
