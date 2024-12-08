@@ -11,7 +11,7 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = 'no'
+app.secret_key = '0VYK5QEFFthM7OBWwZGkbUpVBr8kCLQp'
 
 
 def get_db_connection():
@@ -76,6 +76,20 @@ def init_db():
     finally:
         conn.close()
 
+#beta html
+@app.route('/video_beta')
+def video_beta():
+    return render_template('beta/video_beta.html')
+
+#blog html
+@app.route('/v104')
+def v104():
+    return render_template('blog/v104.html')
+
+@app.route('/going_forward')
+def going_forward():
+    return render_template('blog/going_forward.html')
+
 @app.route('/bugs_fixed')
 def bugs_fixed():
     return render_template('blog/bugs_fixed.html')
@@ -100,6 +114,7 @@ def v103():
 def privacy():
     return render_template('blog/privacy.html')
 
+#suggestions html
 @app.route('/suggestions')
 def suggestions():
     return render_template('suggestions.html')
