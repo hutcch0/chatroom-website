@@ -1,6 +1,3 @@
-/* rules.css */
-
-/* Style for the News page title above the content box */
 .page-title {
     font-size: 36px;
     color: #0a999e;
@@ -11,7 +8,6 @@
     letter-spacing: 2px;
 }
 
-/* Center the entire content on the page */
 body {
     font-family: Arial, sans-serif;
     background: #08030d;
