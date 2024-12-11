@@ -7,12 +7,52 @@ import os
 import traceback
 import re
 from datetime import datetime
+import functools
+import time
+import secrets
 
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = '0VYK5QEFFthM7OBWwZGkbUpVBr8kCLQp'
 
+app.secret_key = secrets.token_hex(32)
+
+def performance_monitor(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+
+        logging.info(f"Function {func.__name__} took {end_time - start_time:.4f} seconds")
+        return result
+    return wrapper
+
+def timed_lru_cache(seconds=300, maxsize=128):
+    def decorator(func):
+        cache = {}
+        cache_expiration = {}
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            key = str(args) + str(kwargs)
+            current_time = time.time()
+
+            if key in cache and current_time < cache_expiration.get(key, 0):
+                return cache[key]
+
+            result = func(*args, **kwargs)
+            cache[key] = result
+            cache_expiration[key] = current_time + seconds
+
+            if len(cache) > maxsize:
+                oldest_key = min(cache_expiration, key=cache_expiration.get)
+                del cache[oldest_key]
+                del cache_expiration[oldest_key]
+
+            return result
+        return wrapper
+    return decorator
 
 def get_db_connection():
     try:
@@ -21,60 +61,112 @@ def get_db_connection():
             user=config.DB_USER,
             password=config.DB_PASSWORD,
             database=config.DB_NAME,
-            cursorclass=pymysql.cursors.DictCursor
+            cursorclass=pymysql.cursors.DictCursor,
+            charset='utf8mb4',
+            connect_timeout=10,
+            read_timeout=10,
+            write_timeout=10
         )
     except pymysql.MySQLError as e:
         logging.error(f"Database connection error: {e}")
         return None
 
+@performance_monitor
+def load_messages(page=1, per_page=50):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            offset = (page - 1) * per_page
 
-@app.before_first_request
-def init_db():
+            query = '''
+            SELECT id, content, username
+            FROM messages
+            ORDER BY id DESC
+            LIMIT %s OFFSET %s
+            '''
+            cursor.execute(query, (per_page, offset))
+            messages = cursor.fetchall()
+
+            for message in messages:
+                if contains_blacklisted_word(message['content']):
+                    message['content'] = '[Message removed]'
+
+            cursor.execute('SELECT COUNT(*) as total FROM messages')
+            total_messages = cursor.fetchone()['total']
+
+            return {
+                'messages': messages,
+                'total_pages': (total_messages + per_page - 1) // per_page
+            }
+    finally:
+        conn.close()
+
+@performance_monitor
+@timed_lru_cache(seconds=300)
+def get_cached_user_stats(username):
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS messages (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    content TEXT NOT NULL,
-                    username VARCHAR(50) DEFAULT NULL
-                )
-            ''')
-
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS admins (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    username VARCHAR(50) UNIQUE NOT NULL,
-                    password_hash VARCHAR(255) NOT NULL
-                )
-            ''')
-
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS users (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    username VARCHAR(50) UNIQUE NOT NULL,
-                    password_hash VARCHAR(255) NOT NULL
-                )
-            ''')
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS leaderboard (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    username VARCHAR(50) NOT NULL,
-                    score INT NOT NULL,
-                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-
-            cursor.execute('SELECT COUNT(*) as count FROM admins')
-            if cursor.fetchone()['count'] == 0:
-                hashed_password = generate_password_hash(config.ADMIN_PASSWORD)
-                cursor.execute(
-                    'INSERT INTO admins (username, password_hash) VALUES (%s, %s)',
-                    (config.ADMIN_USERNAME, hashed_password)
-                )
-        conn.commit()
+                SELECT
+                    COUNT(*) as message_count,
+                    MAX(id) as last_message_id,
+                    (SELECT fake_money FROM users WHERE username = %s) as fake_money
+                FROM messages
+                WHERE username = %s
+            ''', (username, username))
+            return cursor.fetchone()
     finally:
         conn.close()
+
+@app.route('/profile')
+def profile():
+    username = session.get('username')
+
+    if not username:
+        return redirect(url_for('login'))
+
+    user_stats = get_cached_user_stats(username)
+
+    user = {
+        'username': username,
+        'fake_money': user_stats['fake_money'] if user_stats else 0,
+        'messages_count': user_stats['message_count'] if user_stats else 0
+    }
+
+    return render_template('profile.html', user=user, now=datetime.now())
+
+@performance_monitor
+@timed_lru_cache(seconds=300)
+def get_top_users(limit=10):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('''
+                SELECT username, fake_money
+                FROM users
+                ORDER BY fake_money DESC
+                LIMIT %s
+            ''', (limit,))
+            return cursor.fetchall()
+    finally:
+        conn.close()
+
+@app.route('/leaderboard')
+def leaderboard():
+    leaderboard_data = get_top_users()
+
+    leaderboard_dict = {
+        index + 1: {'username': data['username'], 'fake_money': data['fake_money']}
+        for index, data in enumerate(leaderboard_data)
+    }
+
+    return render_template('leaderboard.html', leaderboard_data=leaderboard_dict)
+
+@app.route('/poll_messages', methods=['GET'])
+def poll_messages():
+    messages = load_messages()
+    return jsonify({'messages': messages})
 
 #beta html
 @app.route('/video_beta')
@@ -82,6 +174,11 @@ def video_beta():
     return render_template('beta/video_beta.html')
 
 #blog html
+
+@app.route('/blog')
+def blog():
+    return render_template('blog/blog.html')
+
 @app.route('/v104')
 def v104():
     return render_template('blog/v104.html')
@@ -160,45 +257,6 @@ def search_profile():
     except pymysql.MySQLError as e:
         logging.error(f"Error searching profile data: {e}")
         return "An error occurred while searching for the profile.", 500
-    finally:
-        connection.close()
-
-@app.route('/profile')
-def profile():
-
-    username = session.get('username')
-
-    if not username:
-        return redirect(url_for('login'))
-
-
-    connection = get_db_connection()
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT username, fake_money FROM users WHERE username = %s", (username,))
-            user_data = cursor.fetchone()
-
-            cursor.execute("SELECT COUNT(*) as messages_count FROM messages WHERE username = %s", (username,))
-            message_count_data = cursor.fetchone()
-
-            if user_data:
-                user = {
-                    'username': user_data['username'],
-                    'fake_money': user_data['fake_money'],
-                    'messages_count': message_count_data['messages_count']
-                }
-            else:
-                user = None
-
-
-            now = datetime.now()
-
-
-            return render_template('profile.html', user=user, now=now)
-
-    except pymysql.MySQLError as e:
-        logging.error(f"Error fetching profile data: {e}")
-        return "An error occurred while fetching profile data.", 500
     finally:
         connection.close()
 
@@ -299,29 +357,6 @@ def update_fake_money_in_db(username, fake_money):
     connection.commit()
     cursor.close()
     connection.close()
-
-@app.route('/blog')
-def blog():
-    return render_template('blog/blog.html')
-
-@app.route('/leaderboard')
-def leaderboard():
-    connection = get_db_connection()
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT username, fake_money FROM users ORDER BY fake_money DESC LIMIT 10")
-            leaderboard_data = cursor.fetchall()
-
-
-            leaderboard_data = {index + 1: {'username': data['username'], 'fake_money': data['fake_money']}
-                                 for index, data in enumerate(leaderboard_data)}
-
-            return render_template('leaderboard.html', leaderboard_data=leaderboard_data)
-    except pymysql.MySQLError as e:
-        print(f"Error fetching leaderboard data: {e}")
-        return "Error fetching leaderboard data", 500
-    finally:
-        connection.close()
 
 @app.route('/update_score', methods=['POST'])
 def update_score():
@@ -496,12 +531,6 @@ def admin_login():
 
     return render_template('admin/admin.html')
 
-@app.route('/chatroom')
-def chatroom_page():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    return render_template('chatroom.html')
-
 @app.route('/image_viewer')
 def image_viewer():
     return render_template('image_viewer.html')
@@ -579,13 +608,6 @@ def save_message(content, username=None):
         return message_id
     finally:
         conn.close()
-
-
-@app.route('/poll_messages', methods=['GET'])
-def poll_messages():
-    messages = load_messages()
-    return jsonify({'messages': messages})
-
 
 @app.route('/admin/delete_message', methods=['POST'])
 def delete_message_route():
