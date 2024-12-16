@@ -179,6 +179,14 @@ def video_beta():
 def blog():
     return render_template('blog/blog.html')
 
+@app.route('/music_2024vs2023')
+def music_2024vs2023():
+    return render_template('blog/music_2024vs2023.html')
+
+@app.route('/music_2024')
+def music_2024():
+    return render_template('blog/music_2024.html')
+
 @app.route('/v104')
 def v104():
     return render_template('blog/v104.html')
